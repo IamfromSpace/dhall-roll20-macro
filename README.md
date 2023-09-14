@@ -1,11 +1,22 @@
 # Make Roll20 Macros with Dhall
 
-This is an semi-experimental project to see if Dhall could reign in the chaos that is the ad hoc macro language for rolling dice in Roll20, which seems to fall under the classic, "whoops, we made a DSL" problem.
-As such, it has some _very_ odd and unpredictable ways that things interact, especially when using nested.
-We here attempt to use Dhall to enable the full suite of features (though many are still TODO), while capturing all type invariants.
-By using GADT-like structures, we can even encode contextual operators that are still mutually recursive.
-It's worth noting that the type magic here to do this can result in extremely unhelpful errors.
-However, this approach has a useful outcome: anything that compiles is a valid macro that behaves predictably.
+For many roll20 users, the macro  DSL (domain specific language) is undeniably accessible, offering a low barrier of entry to create simple helpers in their games.
+However, as macros become more intricate, they can quickly evolve into bewildering collections gotchas where small errors are a nightmare to debug.
+While the roll20 macro DSL be quite powerful, it's has clearly evolved in an ad hoc way that's made it a bit of a monster.
+
+By leveraging Dhall, we can tame this beast a bit, as it provides numerous benefits:
+
+  - **Strong Typing**: With this library, you can _only_ create valid macros.
+    If it compiles it works, and it works predictably.
+  - **Complex Escaping Handling**: The library takes care of the intricate task of handling numerous escaping rules, especially the madness of escaping nested queries.
+  - **Variables and Functions**: Dhall brings variables and functions to the table, allowing you to break down complex macros and reuse common components.
+  - **Total Language**: Dhall's totality ensures that you can't inadvertently create infinite loops or exceptions in your Dhall code.
+    It compiles or it doesn't; if it compiles, it works.
+
+If you're a Dhall programmer who knows nothing about roll20 macros, this project is an interesting semi-experimental exploration of advanced Dhall concepts in action.
+It uses mutual recursion and GADT-like structures, showcasing how Dhall can wrangle even complex problems into something type safe.
+
+As a final note, a downside of the type wizardry going on to enforce invariants, the compile errors one sees are unfortunately quite complex.
 
 ## Hello, World
 
