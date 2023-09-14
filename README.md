@@ -18,7 +18,42 @@ It uses mutual recursion and GADT-like structures, showcasing how Dhall can wran
 
 As a final note, a downside of the type wizardry going on to enforce invariants, the compile errors one sees are unfortunately quite complex.
 
-## Hello, World
+## Quick Start
+
+In this section, we detail how to create a simple macro that just prints the text, "Hello, world!"
+
+### Step 1: Install Dhall
+
+[Install Dhall](https://docs.dhall-lang.org/tutorials/Getting-started_Generate-JSON-or-YAML.html#installation) on your system.
+
+### Step 2: Write the Code
+
+Create a file named `hello_world.dhall` and add the following content:
+
+```dhall
+let Ast = http://TODO
+
+in Ast.render
+    (Ast.singleton/Commands
+      (Ast.broadcast/Text
+        (Ast.literal/Text "Hello, world!")
+      )
+    )
+```
+
+### Step 3: Generate the final text
+
+Run the following command to output the macro rendered as text to a file:
+
+```bash
+dhall text <<< './hello_world.dhall' > hello_world.txt
+```
+
+Inside the `hello_world.txt` file is the finished macro, which is ready to be copied into roll20.
+
+## Tutorial
+
+### Hello, World
 
 ```dhall
 let Ast = http://TODO
