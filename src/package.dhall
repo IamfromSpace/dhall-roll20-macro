@@ -17,6 +17,7 @@ let Target = < Selected | Named : Text | Implicit >
 let Ast/Output =
       { Natural : Type
       , Integer : Type
+      , Random : Type -> Type
       , Text : Type
       , TableEntries : Type
       , Table : Type
@@ -139,10 +140,33 @@ let Ast/Constructors =
               }
           , ToInteger : output.Natural -> output.Integer
           , AbsoluteValue : output.Integer -> output.Natural
-          , Dice : output.Natural -> output.Natural -> output.Natural
+          , Dice :
+              { Natural :
+                  output.Natural ->
+                  output.Natural ->
+                    output.Random output.Natural
+              , Random :
+                  output.Random output.Natural ->
+                  output.Random output.Natural ->
+                    output.Random output.Natural
+              }
+          , ToRandom :
+              { Natural : output.Natural -> output.Random output.Natural
+              , Integer : output.Integer -> output.Random output.Integer
+              }
           , Labeled :
               { Integer : output.Text -> output.Integer -> output.Integer
               , Natural : output.Text -> output.Natural -> output.Natural
+              , Random :
+                  { Natural :
+                      output.Random output.Natural ->
+                      output.Random output.Natural ->
+                        output.Random output.Natural
+                  , Integer :
+                      output.Random output.Integer ->
+                      output.Random output.Integer ->
+                        output.Random output.Integer
+                  }
               }
           , PlusPlus : output.Text -> output.Text -> output.Text
           , Cons :
@@ -185,14 +209,38 @@ let Ast/Constructors =
           , Add :
               { Integer : output.Integer -> output.Integer -> output.Integer
               , Natural : output.Natural -> output.Natural -> output.Natural
+              , Random :
+                  { Natural :
+                      output.Random output.Natural ->
+                      output.Random output.Natural ->
+                        output.Random output.Natural
+                  , Integer :
+                      output.Random output.Integer ->
+                      output.Random output.Integer ->
+                        output.Random output.Integer
+                  }
               }
           , Multiply :
               { Integer : output.Integer -> output.Integer -> output.Integer
               , Natural : output.Natural -> output.Natural -> output.Natural
+              , Random :
+                  { Natural :
+                      output.Random output.Natural ->
+                      output.Random output.Natural ->
+                        output.Random output.Natural
+                  , Integer :
+                      output.Random output.Integer ->
+                      output.Random output.Integer ->
+                        output.Random output.Integer
+                  }
               }
           , Show :
               { Integer : output.Integer -> output.Text
               , Natural : output.Natural -> output.Text
+              , Random :
+                  { Natural : output.Random output.Natural -> output.Text
+                  , Integer : output.Random output.Integer -> output.Text
+                  }
               }
           , Broadcast :
               { Text : output.Text -> output.Command
@@ -221,6 +269,18 @@ let Ast/Integer
     = forall (output : Ast/Output) ->
       forall (cs : Ast/Constructors output) ->
         output.Integer
+
+let Ast/Random/Natural
+    : Type
+    = forall (output : Ast/Output) ->
+      forall (cs : Ast/Constructors output) ->
+        output.Random output.Natural
+
+let Ast/Random/Integer
+    : Type
+    = forall (output : Ast/Output) ->
+      forall (cs : Ast/Constructors output) ->
+        output.Random output.Integer
 
 let Ast/Text
     : Type
@@ -381,6 +441,7 @@ let Ast/render
         x
           { Integer = Text
           , Natural = Text
+          , Random = \(a : Type) -> Text
           , Text = Text
           , TableEntries = Text
           , Table = Text
@@ -511,14 +572,22 @@ let Ast/render
                       }
               , ToInteger = Text/id
               , AbsoluteValue = \(t : Text) -> "abs(${t})"
-              , Dice = 
-                  -- TODO: If a die roll uses simple math to calculate count or sides, that works with parens like (1+2)d6.  But if we determine the count or number of sides with dice we need double square brackets like [[1d6]]d6.  Note that we technically _can_ roll negative numbers: they just are always treated as 0.
-                  -- TODO: We probably want a new Random type.  Integers and Naturals can be converted to Randoms.
-                  \(count : Text) -> \(sides : Text) -> "${count}d${sides}"
-              , Labeled =
-                { Integer = \(label : Text) -> \(x : Text) -> "${x}[${label}]"
-                , Natural = \(label : Text) -> \(x : Text) -> "${x}[${label}]"
+              , Dice =
+                { Natural =
+                    \(count : Text) -> \(sides : Text) -> "${count}d${sides}"
+                , Random =
+                    \(count : Text) ->
+                    \(sides : Text) ->
+                      "[[${count}]]d[[${sides}]]"
                 }
+              , ToRandom = { Natural = Text/id, Integer = Text/id }
+              , Labeled =
+                  let f = \(label : Text) -> \(x : Text) -> "${x}[${label}]"
+
+                  in  { Integer = f
+                      , Natural = f
+                      , Random = { Integer = f, Natural = f }
+                      }
               , PlusPlus = \(a : Text) -> \(b : Text) -> a ++ b
               , Cons =
                 { DropdownOptions =
@@ -545,17 +614,26 @@ let Ast/render
                 , Commands = \(a : Text) -> \(b : Text) -> a ++ "\n" ++ b
                 }
               , Add =
-                { Integer = \(a : Text) -> \(b : Text) -> "(${a} + ${b})"
-                , Natural = \(a : Text) -> \(b : Text) -> "(${a} + ${b})"
-                }
+                  let f = \(a : Text) -> \(b : Text) -> "(${a} + ${b})"
+
+                  in  { Integer = f
+                      , Natural = f
+                      , Random = { Natural = f, Integer = f }
+                      }
               , Multiply =
-                { Integer = \(a : Text) -> \(b : Text) -> "(${a} * ${b})"
-                , Natural = \(a : Text) -> \(b : Text) -> "(${a} * ${b})"
-                }
+                  let f = \(a : Text) -> \(b : Text) -> "(${a} * ${b})"
+
+                  in  { Integer = f
+                      , Natural = f
+                      , Random = { Integer = f, Natural = f }
+                      }
               , Show =
-                { Integer = \(t : Text) -> "[[${t}]]"
-                , Natural = \(t : Text) -> "[[${t}]]"
-                }
+                  let f = \(t : Text) -> "[[${t}]]"
+
+                  in  { Integer = f
+                      , Natural = f
+                      , Random = { Natural = f, Integer = f }
+                      }
               , Broadcast = { Text = Text/id, Table = Text/id }
               , BroadcastAs =
                 { Text = renderBroadcastAs, Table = renderBroadcastAs }
@@ -925,13 +1003,35 @@ let Ast/AbsoluteValue
       \(cs : Ast/Constructors output) ->
         (cs 0).AbsoluteValue (x output cs)
 
-let Ast/Dice
-    : Ast/Natural -> Ast/Natural -> Ast/Natural
+let Ast/Dice/Natural
+    : Ast/Natural -> Ast/Natural -> Ast/Random/Natural
     = \(x : Ast/Natural) ->
       \(y : Ast/Natural) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Dice (x output cs) (y output cs)
+        (cs 0).Dice.Natural (x output cs) (y output cs)
+
+let Ast/Dice/Random
+    : Ast/Random/Natural -> Ast/Random/Natural -> Ast/Random/Natural
+    = \(x : Ast/Random/Natural) ->
+      \(y : Ast/Random/Natural) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Dice.Random (x output cs) (y output cs)
+
+let Ast/ToRandom/Natural
+    : Ast/Natural -> Ast/Random/Natural
+    = \(x : Ast/Natural) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).ToRandom.Natural (x output cs)
+
+let Ast/ToRandom/Integer
+    : Ast/Integer -> Ast/Random/Integer
+    = \(x : Ast/Integer) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).ToRandom.Integer (x output cs)
 
 let Ast/Label/Integer
     : Ast/Text -> Ast/Integer -> Ast/Integer
@@ -1065,6 +1165,22 @@ let Ast/Add/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).Add.Natural (x output cs) (y output cs)
 
+let Ast/Add/Random/Natural
+    : Ast/Random/Natural -> Ast/Random/Natural -> Ast/Random/Natural
+    = \(x : Ast/Random/Natural) ->
+      \(y : Ast/Random/Natural) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Add.Random.Natural (x output cs) (y output cs)
+
+let Ast/Add/Random/Integer
+    : Ast/Random/Integer -> Ast/Random/Integer -> Ast/Random/Integer
+    = \(x : Ast/Random/Integer) ->
+      \(y : Ast/Random/Integer) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Add.Random.Integer (x output cs) (y output cs)
+
 let Ast/Multiply/Integer
     : Ast/Integer -> Ast/Integer -> Ast/Integer
     = \(x : Ast/Integer) ->
@@ -1081,6 +1197,22 @@ let Ast/Multiply/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).Multiply.Natural (x output cs) (y output cs)
 
+let Ast/Multiply/Random/Integer
+    : Ast/Random/Integer -> Ast/Random/Integer -> Ast/Random/Integer
+    = \(x : Ast/Random/Integer) ->
+      \(y : Ast/Random/Integer) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Multiply.Random.Integer (x output cs) (y output cs)
+
+let Ast/Multiply/Random/Natural
+    : Ast/Random/Natural -> Ast/Random/Natural -> Ast/Random/Natural
+    = \(x : Ast/Random/Natural) ->
+      \(y : Ast/Random/Natural) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Multiply.Random.Natural (x output cs) (y output cs)
+
 let Ast/Show/Integer
     : Ast/Integer -> Ast/Text
     = \(x : Ast/Integer) ->
@@ -1094,6 +1226,20 @@ let Ast/Show/Natural
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Show.Natural (x output cs)
+
+let Ast/Show/Random/Natural
+    : Ast/Random/Natural -> Ast/Text
+    = \(x : Ast/Random/Natural) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Show.Random.Natural (x output cs)
+
+let Ast/Show/Random/Integer
+    : Ast/Random/Integer -> Ast/Text
+    = \(x : Ast/Random/Integer) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Show.Random.Integer (x output cs)
 
 let Ast/Broadcast/Text
     : Ast/Text -> Ast/Command
@@ -1194,8 +1340,8 @@ let exampleAstSelectDiceSidesFromMathOnAttributesAndAbilities =
       :     Ast/render
               ( Ast/Singleton/Commands
                   ( Ast/Broadcast/Text
-                      ( Ast/Show/Natural
-                          ( Ast/Dice
+                      ( Ast/Show/Random/Natural
+                          ( Ast/Dice/Natural
                               (Ast/Literal/Natural 4)
                               ( Ast/Add/Natural
                                   ( Ast/Attribute/Natural
@@ -1217,6 +1363,27 @@ let exampleAstSelectDiceSidesFromMathOnAttributesAndAbilities =
                   )
               )
         ===  "[[4d(@{selected|some_att} + (%{some_ab} * 5))]]"
+
+let exampleAstSelectDiceSidesARandomValue =
+        assert
+      :     Ast/render
+              ( Ast/Singleton/Commands
+                  ( Ast/Broadcast/Text
+                      ( Ast/Show/Random/Natural
+                          ( Ast/Dice/Random
+                              (Ast/ToRandom/Natural (Ast/Literal/Natural 4))
+                              ( Ast/Add/Random/Natural
+                                  ( Ast/Dice/Natural
+                                      (Ast/Literal/Natural 1)
+                                      (Ast/Literal/Natural 6)
+                                  )
+                                  (Ast/ToRandom/Natural (Ast/Literal/Natural 2))
+                              )
+                          )
+                      )
+                  )
+              )
+        ===  "[[[[4]]d[[(1d6 + 2)]]]]"
 
 let exampleAstNestedStringQueries =
         assert
