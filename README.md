@@ -31,7 +31,7 @@ In this section, we detail how to create a simple macro that just prints the tex
 Create a file named `hello_world.dhall` and add the following content:
 
 ```dhall
-let Ast = http://TODO
+let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main/src/package.dhall
 
 in Ast.render
     (Ast.singleton/Commands
@@ -61,7 +61,7 @@ To start with, let's take a look at how a "Hello, world!" macro can be defined, 
 
 ```dhall
 -- Import the library
-let Ast = http://TODO
+let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main/src/package.dhall
 
 -- Define a variable with our command
 let helloWorldCommand : Ast.Command =
@@ -119,7 +119,7 @@ We'll start simple and roll a single six sided die.
 
 ```dhall
 -- Import the library
-let Ast = http://TODO
+let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main/src/package.dhall
 
 -- Define a variable that represents rolling a six sided die.
 let d6 : Ast.Random/Natural =
@@ -182,7 +182,7 @@ For our macro, we want to do three things: emote, broadcast, and roll.
 Let's see our finished macro first, and then we'll break it down.
 
 ```dhall
-let Ast = http://TODO
+let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main/src/package.dhall
 
 let emoteCommand : Ast.Command =
   Ast.emote/Text
