@@ -256,6 +256,10 @@ let Ast/Constructors =
               { Text : output.Text -> output.Text -> output.Command
               , Table : output.Text -> output.Table -> output.Command
               }
+          , Roll :
+              { Natural : output.Random output.Natural -> output.Command
+              , Integer : output.Random output.Integer -> output.Command
+              }
           }
 
 let Ast/Natural
@@ -640,6 +644,10 @@ let Ast/render
               , Emote = Text/id
               , EmoteAs = renderEmoteAs
               , Whisper = { Text = renderWhisper, Table = renderWhisper }
+              , Roll =
+                  let f = \(r : Text) -> "/r ${r}"
+
+                  in  { Natural = f, Integer = f }
               }
           )
 
@@ -1302,6 +1310,20 @@ let Ast/Whisper/Table
       \(cs : Ast/Constructors output) ->
         (cs 0).Whisper.Table (to output cs) (message output cs)
 
+let Ast/Roll/Natural
+    : Ast/Random/Natural -> Ast/Command
+    = \(random : Ast/Random/Natural) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Roll.Natural (random output cs)
+
+let Ast/Roll/Integer
+    : Ast/Random/Integer -> Ast/Command
+    = \(random : Ast/Random/Integer) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Roll.Integer (random output cs)
+
 let exampleAstBasicaMultiplication =
         assert
       :     Ast/render
@@ -1339,51 +1361,45 @@ let exampleAstSelectDiceSidesFromMathOnAttributesAndAbilities =
         assert
       :     Ast/render
               ( Ast/Singleton/Commands
-                  ( Ast/Broadcast/Text
-                      ( Ast/Show/Random/Natural
-                          ( Ast/Dice/Natural
-                              (Ast/Literal/Natural 4)
-                              ( Ast/Add/Natural
-                                  ( Ast/Attribute/Natural
-                                      { char = Target.Selected
-                                      , name = "some_att"
+                  ( Ast/Roll/Natural
+                      ( Ast/Dice/Natural
+                          (Ast/Literal/Natural 4)
+                          ( Ast/Add/Natural
+                              ( Ast/Attribute/Natural
+                                  { char = Target.Selected, name = "some_att" }
+                              )
+                              ( Ast/Multiply/Natural
+                                  ( Ast/Ability/Natural
+                                      { char = Target.Implicit
+                                      , name = "some_ab"
                                       }
                                   )
-                                  ( Ast/Multiply/Natural
-                                      ( Ast/Ability/Natural
-                                          { char = Target.Implicit
-                                          , name = "some_ab"
-                                          }
-                                      )
-                                      (Ast/Literal/Natural 5)
-                                  )
+                                  (Ast/Literal/Natural 5)
                               )
                           )
                       )
                   )
               )
-        ===  "[[4d(@{selected|some_att} + (%{some_ab} * 5))]]"
+        ===  "/r 4d(@{selected|some_att} + (%{some_ab} * 5))"
 
 let exampleAstSelectDiceSidesARandomValue =
         assert
       :     Ast/render
               ( Ast/Singleton/Commands
-                  ( Ast/Broadcast/Text
-                      ( Ast/Show/Random/Natural
-                          ( Ast/Dice/Random
-                              (Ast/ToRandom/Natural (Ast/Literal/Natural 4))
-                              ( Ast/Add/Random/Natural
-                                  ( Ast/Dice/Natural
-                                      (Ast/Literal/Natural 1)
-                                      (Ast/Literal/Natural 6)
-                                  )
-                                  (Ast/ToRandom/Natural (Ast/Literal/Natural 2))
+                  ( Ast/Roll/Natural
+                      ( Ast/Dice/Random
+                          (Ast/ToRandom/Natural (Ast/Literal/Natural 4))
+                          ( Ast/Add/Random/Natural
+                              ( Ast/Dice/Natural
+                                  (Ast/Literal/Natural 1)
+                                  (Ast/Literal/Natural 6)
                               )
+                              (Ast/ToRandom/Natural (Ast/Literal/Natural 2))
                           )
                       )
                   )
               )
-        ===  "[[[[4]]d[[(1d6 + 2)]]]]"
+        ===  "/r [[4]]d[[(1d6 + 2)]]"
 
 let exampleAstNestedStringQueries =
         assert
