@@ -111,6 +111,69 @@ This function takes a single command converts it into a list with just one entry
 
 With all that put together, our `helloWorldMacro` is equivalent to the text "Hello, world!"
 
+### Hello, dice!
+
+We've now seen how to broadcast a fixed piece of text, but that's not very interesting in of itself.
+Let's get the core of what we're really trying to accomplish: roll some dice!
+We'll start simple and roll a single six sided die.
+
+```dhall
+-- Import the library
+let Ast = http://TODO
+
+-- Define a variable that represents rolling a six sided die.
+let d6 : Ast.Random/Natural =
+  -- How we create dice rolls, which always takes two Ast.Naturals
+  (Ast.dice/Natural
+    -- Create an Ast/Natural from regular Natural, the number of dice
+    (Ast.literal/Natural 1)
+    -- Create an Ast/Natural from regular Natural, the number of sides
+    (Ast.literal/Natural 6)
+  )
+
+-- Define a variable that says how we want to roll our die: we want to broadcast it!
+let diceCommand : Ast.Command =
+  Ast.roll/Random/Natural d6
+
+-- Define a variable with finished macro
+let diceMacro : Text =
+  -- Turn the commands into a finished macro
+  Ast.render
+    -- Turn our single command into the multiple commands type
+    (Ast.singleton/Commands diceCommand)
+
+-- For the purposes of this tutorial, a test validates the output
+let test =
+  assert : diceMacro === "/r 1d6"
+
+-- Use the final macro as the output of this file
+in diceMacro
+```
+
+Structurally, a lot is the same here, despite changing a few names.
+At the end, `diceMacro` handles some of the final boilerplate and the test is updated to reflect the new expectation.
+The core of the change is in how we define `d6` and `diceCommand`.
+
+First, we're going to define a variable that represents rolling a six sided die, named `d6`.
+We use the `Ast.dice/Natural` function, which takes in two arguments, the number of dice rolled and the number of sides on each die.
+However, these two arguments aren't just numbers, the are `Ast.Naturals`.
+`Ast.Naturals` are always positive and they might actually be made up of math, attributes, abilities, other macros, or etc.
+In this case though, we're not doing anything fancy, we just want a regular `Natural`.
+We use a similar approach as we did with text, we use `Ast.literal/Natural` to say that we want a literal number to form this portion of our Abstract Syntax Tree.
+
+Note that the output type of `Ast.dice/Natural` (and therefore type of the `d6` variable) is an `Ast/Random/Natural`.
+This is like an `Ast/Natural`, but instead of being a known natural, it's a random one.
+Certain functions only accept `Ast/Naturals` and others only accept `Ast/Random/Naturals`.
+This may seem more challenging, but this allows the library to distinguish between cases where it needs to produce something like `1d6`, `1d(1+5)`, or `1d[[1d6]]` in a way that is always correct without obfuscating the result too much.
+The type checking helps make sure you always get a macro built in the right way, without having to know all the rules (or at least having the type checker guide you if you try to break them).
+
+With our die roll defined, we now have to use it.
+We create a variable named `diceCommand` and use the function `Ast.roll/Random/Natural` to indicate that we want to broadcast the `d6` dice roll and to expect it to have the `Ast.Random/Natural` type.
+We want this particular function instead of something like `Ast.gmRoll/Random/Integer`, which would send the roll only to the GM, and might give in negative numbers.
+This turns our roll into an `Ast.Command`.
+
+With an `Ast.Command` we're now ready to turn it into macro in the final step, as `diceMacro`.
+
 ### Hello, World as a Check
 
 Our "Hello, world!" example at the moment mostly just makes us type a lot.
