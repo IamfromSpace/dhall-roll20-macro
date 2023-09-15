@@ -174,7 +174,84 @@ This turns our roll into an `Ast.Command`.
 
 With an `Ast.Command` we're now ready to turn it into macro in the final step, as `diceMacro`.
 
-### Hello, World as a Check
+### Hello, checks!
+
+In the above section, we've seen how to roll dice, however, frequently a single roll isn't enough.
+For real world macros we're often going to add other numbers like modifiers.
+
+Doing math is a bit counter intuitive at first, since we need to define it in a tree structure, but we'll break it down a step at a time.
+At a high level, even though we typically use _infix_ notation for math (like `2 + 2`), we're now going to use _Polish_ notation, where we have the operator first (like `+ 2 2`).
+This probably looks pretty strange, but a major advantage of this is that precedence of operations is no longer ambiguous.
+Parenthesis will automatically added to your macro output to make sure everything happens in the order you define.
+
+Let's consider a macro for a strength check, where we add our characters strength (here, +4) to a d20 roll.
+
+```dhall
+-- Import the library
+let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main/src/package.dhall
+
+-- Define a variable that represents rolling a 20 sided die.
+let d20 : Ast.Random/Natural =
+  -- How we create dice rolls, which always takes two Ast.Naturals
+  (Ast.dice/Natural
+    -- Create an Ast/Natural from regular Natural, the number of dice
+    (Ast.literal/Natural 1)
+    -- Create an Ast/Natural from regular Natural, the number of sides
+    (Ast.literal/Natural 20)
+  )
+
+-- Define "d20 + 4"
+let d20Plus4 : Ast.Random/Natural =
+  -- Say we're going to add two random things
+  Ast.add/Random/Natural
+    -- The left hand side, our die roll defined above
+    d20
+    -- The right hand side, a literal Natural (4) that we convert to a Random Natural
+    (Ast.toRandom/Natural
+      (Ast.literal/Natural 4)
+    )
+
+-- Define a variable that says what to do with our check: broadcast it!
+let checkCommand : Ast.Command =
+  Ast.roll/Random/Natural d20Plus4
+
+-- Define a variable with finished macro
+let checkMacro : Text =
+  -- Turn the commands into a finished macro
+  Ast.render
+    -- Turn our single command into the multiple commands type
+    (Ast.singleton/Commands checkCommand)
+
+-- For the purposes of this tutorial, a test validates the output
+let test =
+  assert : checkMacro === "/r (1d20 + 4)"
+
+-- Use the final macro as the output of this file
+in checkMacro
+```
+
+You can again see a lot of structural similarities to our previous example.
+We define a die roll (this time a d20 instead of a d6), we eventually roll something, we turn that roll into a macro, test it, and output it.
+The key difference is that instead of rolling only our die (the `d20` variable), we're going to roll the check that adds the bonus (the `d20Plus4` variable).
+
+If we look at how we define the `d20Plus4` variable, you'll see the first thing is the `Ast.add/Random/Natural` function.
+This is again because we're using Polish notation here, so the operator comes first, followed by the arguments.
+The first argument (the left hand side in infix notation) is just the roll we already defined above: `d20`.
+The second argument is a bit more complicated, because we need to get our types to line up, but it's ultimately just the `4` on the right hand side.
+
+We've seen the `Ast.literal/Natural` function a couple times, allowing us to say that we want to create a type that _can_ be complicated, but in this case isn't.
+Now we do something similar with `Ast.toRandom/Natural`.
+Notably, when when dice get involved we don't have normal numbers, we have random numbers!
+Random numbers obey different rules for how they're represented in our macros than normal numbers in certain situations.
+So once we introduce a random number into the math, there's no going back.
+You can't make something un-random.
+But we can pretend that something that wasn't random was!
+And that's what `Ast.toRandom/Natural` does.
+We say that we have an `Ast.Natural`, but we'd like to treat it as if it were a random number going forward, so it can interact with other random numbers.
+
+When we put it all together, we get the result we expect: broadcasting the strength check.
+
+### Hello, multiple commands!
 
 Our "Hello, world!" example at the moment mostly just makes us type a lot.
 So let's take a look at a more complex macro, one that does in fact use multiple commands.
