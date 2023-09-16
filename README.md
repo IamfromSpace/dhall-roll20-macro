@@ -451,8 +451,9 @@ let damageCommand : Ast.Command =
   Ast.roll/Natural d6
 
 -- Combine all of our individual commands together
+-- NOTE: We'll show more readable way to do this at the end!
 let attackCommands : Ast.Commands =
-  -- With cons, we can put a new command at the front of a set of commands
+  -- With cons, we can put a new command at the front of a list of commands
   Ast.cons/Commands
     emoteCommand
     (Ast.cons/Commands
@@ -490,5 +491,21 @@ To do that, we use what we've been using all along: `Ast.singleton/Command`, whi
 
 Alternatively, if we have two lists of commands, we can use `Ast.plusPlus/Commands` to put the two lists together.
 This is handy in many cases, and the `Ast.cons/Commands` can't handle this situation!
+
+As a final note, the deeper and deeper indentation of nesting further and further is pretty ugly.
+So lets introduce a helper function that let's us do this more easily: `Ast.fromList/Commands`.
+This function takes a list of individual commands and does all the `Ast.cons/Commands` for us.
+If we re-write that part, we get the following:
+
+```dhall
+let attackCommands : Ast.Commands =
+  Ast.fromList/Commands
+    [ emoteCommand
+    , attackCommand
+    , damageCommand
+    ]
+```
+
+Much nicer!
 
 All together, we now have a macro that does multiple things for us all at once.
