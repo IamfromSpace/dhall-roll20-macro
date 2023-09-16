@@ -236,7 +236,6 @@ let Ast/Constructors =
                         output.Random output.Integer
                   }
               }
-          , PlusPlus : output.Text -> output.Text -> output.Text
           , Cons :
               { DropdownOptions :
                   { Natural :
@@ -282,8 +281,9 @@ let Ast/Constructors =
                   }
               , Commands : output.Command -> output.Commands -> output.Commands
               }
-          , Extend :
-              { TableEntries :
+          , PlusPlus :
+              { Text : output.Text -> output.Text -> output.Text
+              , TableEntries :
                   output.TableEntries ->
                   output.TableEntries ->
                     output.TableEntries
@@ -734,7 +734,6 @@ let Ast/render
                       , Natural = f
                       , Random = { Integer = f, Natural = f }
                       }
-              , PlusPlus = \(a : Text) -> \(b : Text) -> a ++ b
               , Cons =
                 { DropdownOptions =
                     let f =
@@ -755,8 +754,9 @@ let Ast/render
                     \(list : Text) ->
                       command ++ "\n" ++ list
                 }
-              , Extend =
-                { TableEntries = \(a : Text) -> \(b : Text) -> a ++ " " ++ b
+              , PlusPlus =
+                { Text = \(a : Text) -> \(b : Text) -> a ++ b
+                , TableEntries = \(a : Text) -> \(b : Text) -> a ++ " " ++ b
                 , Table = \(a : Text) -> \(b : Text) -> a ++ " " ++ b
                 , Commands = \(a : Text) -> \(b : Text) -> a ++ "\n" ++ b
                 }
@@ -1342,14 +1342,6 @@ let Ast/Label/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).Labeled.Natural (label output cs) (x output cs)
 
-let Ast/PlusPlus
-    : Ast/Text -> Ast/Text -> Ast/Text
-    = \(x : Ast/Text) ->
-      \(y : Ast/Text) ->
-      \(output : Ast/Output) ->
-      \(cs : Ast/Constructors output) ->
-        (cs 0).PlusPlus (x output cs) (y output cs)
-
 let Ast/Cons/DropdownOptions/Natural
     : Ast/DropdownOption/Natural ->
       Ast/DropdownOptions/Natural ->
@@ -1438,29 +1430,37 @@ let Ast/Cons/Commands
       \(cs : Ast/Constructors output) ->
         (cs 0).Cons.Commands (command output cs) (list output cs)
 
-let Ast/Extend/TableEntries
+let Ast/PlusPlus/Text
+    : Ast/Text -> Ast/Text -> Ast/Text
+    = \(x : Ast/Text) ->
+      \(y : Ast/Text) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).PlusPlus.Text (x output cs) (y output cs)
+
+let Ast/PlusPlus/TableEntries
     : Ast/TableEntries -> Ast/TableEntries -> Ast/TableEntries
     = \(x : Ast/TableEntries) ->
       \(y : Ast/TableEntries) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Extend.TableEntries (x output cs) (y output cs)
+        (cs 0).PlusPlus.TableEntries (x output cs) (y output cs)
 
-let Ast/Extend/Table
+let Ast/PlusPlus/Table
     : Ast/Table -> Ast/TableEntries -> Ast/Table
     = \(x : Ast/Table) ->
       \(y : Ast/TableEntries) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Extend.Table (x output cs) (y output cs)
+        (cs 0).PlusPlus.Table (x output cs) (y output cs)
 
-let Ast/Extend/Commands
+let Ast/PlusPlus/Commands
     : Ast/Commands -> Ast/Commands -> Ast/Commands
     = \(x : Ast/Commands) ->
       \(y : Ast/Commands) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Extend.Commands (x output cs) (y output cs)
+        (cs 0).PlusPlus.Commands (x output cs) (y output cs)
 
 let Ast/Add/Integer
     : Ast/Integer -> Ast/Integer -> Ast/Integer
@@ -1649,8 +1649,8 @@ let exampleAstUseTextualAttribute =
       :     Ast/render
               ( Ast/Singleton/Commands
                   ( Ast/Broadcast/Text
-                      ( Ast/PlusPlus
-                          ( Ast/PlusPlus
+                      ( Ast/PlusPlus/Text
+                          ( Ast/PlusPlus/Text
                               (Ast/Literal/Text "I called ")
                               ( Ast/Attribute/Text
                                   { char = Target.Implicit, name = "attribute" }
@@ -1720,7 +1720,7 @@ let exampleAstNestedStringQueries =
                               )
                               ( Ast/ToDropdownOption/Text
                                   "2"
-                                  ( Ast/PlusPlus
+                                  ( Ast/PlusPlus/Text
                                       ( Ast/Literal/Text
                                           "You called the second level: "
                                       )
@@ -1759,7 +1759,7 @@ let exampleAstQueryDepthIsPreservedByTheConversionFromNaturalToText =
                               )
                               ( Ast/ToDropdownOption/Text
                                   "2"
-                                  ( Ast/PlusPlus
+                                  ( Ast/PlusPlus/Text
                                       ( Ast/Literal/Text
                                           "You called the second level: "
                                       )
