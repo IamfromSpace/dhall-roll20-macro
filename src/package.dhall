@@ -88,6 +88,16 @@ let Ast/Constructors =
               { Natural : Text -> Optional output.Natural -> output.Natural
               , Integer : Text -> Optional output.Integer -> output.Integer
               , Text : Text -> Optional output.Text -> output.Text
+              , Random :
+                  { Natural :
+                      Text ->
+                      Optional (output.Random output.Natural) ->
+                        output.Random output.Natural
+                  , Integer :
+                      Text ->
+                      Optional (output.Random output.Integer) ->
+                        output.Random output.Integer
+                  }
               , Command : Text -> Optional output.Command -> output.Command
               }
           , DropdownOption :
@@ -567,7 +577,12 @@ let Ast/render
                                 optionalDefault
                           ++  renderQueryClosingBracket queryDepth
 
-                  in  { Natural = f, Integer = f, Text = f, Command = f }
+                  in  { Natural = f
+                      , Integer = f
+                      , Random = { Natural = f, Integer = f }
+                      , Text = f
+                      , Command = f
+                      }
               , DropdownOption =
                   let f =
                         \(key : Text) ->
@@ -905,6 +920,36 @@ let Ast/Input/Command
               Ast/Command
               output.Command
               (\(default : Ast/Command) -> default output cs)
+              optionalDefault
+          )
+
+let Ast/Input/Random/Natural
+    : Text -> Optional Ast/Random/Natural -> Ast/Random/Natural
+    = \(name : Text) ->
+      \(optionalDefault : Optional Ast/Random/Natural) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Input.Random.Natural
+          name
+          ( Optional/map
+              Ast/Random/Natural
+              (output.Random output.Natural)
+              (\(default : Ast/Random/Natural) -> default output cs)
+              optionalDefault
+          )
+
+let Ast/Input/Random/Integer
+    : Text -> Optional Ast/Random/Integer -> Ast/Random/Integer
+    = \(name : Text) ->
+      \(optionalDefault : Optional Ast/Random/Integer) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Input.Random.Integer
+          name
+          ( Optional/map
+              Ast/Random/Integer
+              (output.Random output.Integer)
+              (\(default : Ast/Random/Integer) -> default output cs)
               optionalDefault
           )
 
