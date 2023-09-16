@@ -251,6 +251,150 @@ We say that we have an `Ast.Natural`, but we'd like to treat it as if it were a 
 
 When we put it all together, we get the result we expect: broadcasting the strength check.
 
+### Parameters
+
+In the above example we create a check with a fixed modifier.
+Sometimes, this is fine, but usually we expect our characters to get stronger, and our modifiers to change over time.
+We'll introduce two ways to do this: referencing roll20 abilities, or using Dhall functions to parameterize our macro definitions.
+
+#### Using Attributes (or Macros, or Abilities)
+
+When our character increases in level, we just want to pop into the character sheet and change some stuff and have our macro immediately pick up those changes.
+Let's make the same macro as before, but instead of a static +4 strength bonus, we'll reference our character's strength.
+
+```dhall
+-- Import the library
+let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main/src/package.dhall
+
+-- Define a variable that represents rolling a 20 sided die.
+let d20 : Ast.Random/Natural =
+  -- How we create dice rolls, which always takes two Ast.Naturals
+  (Ast.dice/Natural
+    -- Create an Ast/Natural from regular Natural, the number of dice
+    (Ast.literal/Natural 1)
+    -- Create an Ast/Natural from regular Natural, the number of sides
+    (Ast.literal/Natural 20)
+  )
+
+-- Define "d20 + 4"
+let d20PlusStrength : Ast.Random/Natural =
+  -- Say we're going to add two random things
+  Ast.add/Random/Natural
+    -- The left hand side, our die roll defined above
+    d20
+    -- The right hand side, a reference to strength
+    (Ast.toRandom/Natural
+      (Ast.attribute/Natural { char = Ast.Target.Implicit, name = "strength_modifier" })
+    )
+
+-- Define a variable that says what to do with our check: broadcast it!
+let attributeCheckCommand : Ast.Command =
+  Ast.roll/Random/Natural d20PlusStrength
+
+-- Define a variable with finished macro
+let attributeCheckMacro : Text =
+  -- Turn the commands into a finished macro
+  Ast.render
+    -- Turn our single command into the multiple commands type
+    (Ast.singleton/Commands attributeCheckCommand)
+
+-- For the purposes of this tutorial, a test validates the output
+let test =
+  assert : attributeCheckMacro === "/r (1d20 + @{strength_modifier})"
+
+-- Use the final macro as the output of this file
+in attributeCheckMacro
+```
+
+Only a bit has changed here.
+Now, instead of adding a literal, we add the attribute.
+We create the attribute with `Ast.attribute/Natural`.
+It might seem odd that we need to specify the type of the attribute here--we can't actually know what the attribute holds!
+However, if we know what type to expect, we can construct a macro that is more likely to work with this reference.
+
+We also need to specify the details of our attribute reference.
+Here we say that the character is an `Implicit` target.
+So we're not specifying exactly who's strength we're using, we let the context decide.
+This is handy for creating reusable macros for abilities as token actions.
+Lastly, we just have to provide the name of the attribute, which in this case is `"strength_modifier"`.
+
+In roll20, we'll have to wire it all up to make this work, which is the downside of this approach.
+
+Referencing macros and abilities is similar, we just use functions like `macro/Natural` and `ability/Natural` to do so.
+
+#### Dhall Functions
+
+In some cases, it's easier to just regenerate the entire macro with a new value, rather than use attributes.
+For a GM, fiddling with attributes for every new encounter is more tedious than helpful.
+Or, if a mega-macro is defined that has everything, there's no need to reference attributes and such.
+Dhall gives us the perfect tool to easy regenerate macros (or varieties of the same macro) when they change: functions!
+Let's take a look at some code for this approach:
+
+```dhall
+-- Import the library
+let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main/src/package.dhall
+
+-- Define a variable that represents rolling a 20 sided die.
+let d20 : Ast.Random/Natural =
+  -- How we create dice rolls, which always takes two Ast.Naturals
+  (Ast.dice/Natural
+    -- Create an Ast/Natural from regular Natural, the number of dice
+    (Ast.literal/Natural 1)
+    -- Create an Ast/Natural from regular Natural, the number of sides
+    (Ast.literal/Natural 20)
+  )
+
+let functionCheckMacro : Natural -> Text =
+  \(modifier : Natural) ->
+
+    -- Define d20 + the modifier
+    let d20PlusModifier : Ast.Random/Natural =
+      -- Say we're going to add two random things
+      Ast.add/Random/Natural
+        -- The left hand side, our die roll defined above
+        d20
+        -- The right hand side, a reference to our function's input parameter
+        (Ast.toRandom/Natural
+          (Ast.literal/Natural modifier)
+        )
+
+    -- Define a variable that says what to do with our check: broadcast it!
+    let functionCheckCommand : Ast.Command =
+      Ast.roll/Random/Natural d20PlusModifier
+
+    -- return then finished macro
+    in
+      -- Turn the commands into a finished macro
+      Ast.render
+        -- Turn our single command into the multiple commands type
+        (Ast.singleton/Commands functionCheckCommand)
+
+-- We make sure our function works with a couple examples
+let test1 =
+  assert : functionCheckMacro 1 === "/r (1d20 + 1)"
+
+let test5 =
+  assert : functionCheckMacro 5 === "/r (1d20 + 5)"
+
+-- Name the value we're going to pass into the function for better readability
+let myCurrentStrength = 6
+
+-- Use the final macro as the output of this file
+in functionCheckMacro myCurrentStrength
+```
+
+You can see this does create a more significant structural change.
+We define a function that creates a macro, rather than defining the macro itself.
+A function uses parameters to use variable that don't yet have a decided value.
+So in this case `modifier` is a Natural, but we're not yet sure exactly which one!
+It could be 12, or 30, or 9999, or all of the above since we can reuse the function as many times as we'd like.
+
+Now, rather than just one test, we have multiple to ensure that our function is as dynamic as we expect.
+We define a `myCurrentStrength` value so it's easy to increment and regenerate our macro when things change.
+
+For trivial examples like these, functions probably don't help much.
+However, functions open a door to making extremely powerful macros that are reusable in many contexts.
+
 ### Hello, multiple commands!
 
 Our "Hello, world!" example at the moment mostly just makes us type a lot.
