@@ -105,6 +105,16 @@ let Ast/Constructors =
                   Text -> output.Natural -> output.DropdownOption output.Natural
               , Integer :
                   Text -> output.Integer -> output.DropdownOption output.Integer
+              , Random :
+                  { Natural :
+                      Text ->
+                      output.Random output.Natural ->
+                        output.DropdownOption (output.Random output.Natural)
+                  , Integer :
+                      Text ->
+                      output.Random output.Integer ->
+                        output.DropdownOption (output.Random output.Integer)
+                  }
               , Text : Text -> output.Text -> output.DropdownOption output.Text
               , TableEntries :
                   Text ->
@@ -124,6 +134,16 @@ let Ast/Constructors =
                   output.DropdownOption output.Integer ->
                   output.DropdownOption output.Integer ->
                     output.DropdownOptions output.Integer
+              , Random :
+                  { Natural :
+                      output.DropdownOption (output.Random output.Natural) ->
+                      output.DropdownOption (output.Random output.Natural) ->
+                        output.DropdownOptions (output.Random output.Natural)
+                  , Integer :
+                      output.DropdownOption (output.Random output.Integer) ->
+                      output.DropdownOption (output.Random output.Integer) ->
+                        output.DropdownOptions (output.Random output.Integer)
+                  }
               , Text :
                   output.DropdownOption output.Text ->
                   output.DropdownOption output.Text ->
@@ -150,6 +170,16 @@ let Ast/Constructors =
                   Text ->
                   output.DropdownOptions output.Integer ->
                     output.Integer
+              , Random :
+                  { Natural :
+                      Text ->
+                      output.DropdownOptions (output.Random output.Natural) ->
+                        output.Random output.Natural
+                  , Integer :
+                      Text ->
+                      output.DropdownOptions (output.Random output.Integer) ->
+                        output.Random output.Integer
+                  }
               , Text : Text -> output.DropdownOptions output.Text -> output.Text
               , TableEntries :
                   Text ->
@@ -217,6 +247,22 @@ let Ast/Constructors =
                       output.DropdownOption output.Integer ->
                       output.DropdownOptions output.Integer ->
                         output.DropdownOptions output.Integer
+                  , Random :
+                      { Natural :
+                          output.DropdownOption
+                            (output.Random output.Natural) ->
+                          output.DropdownOptions
+                            (output.Random output.Natural) ->
+                            output.DropdownOptions
+                              (output.Random output.Natural)
+                      , Integer :
+                          output.DropdownOption
+                            (output.Random output.Integer) ->
+                          output.DropdownOptions
+                            (output.Random output.Integer) ->
+                            output.DropdownOptions
+                              (output.Random output.Integer)
+                      }
                   , Text :
                       output.DropdownOption output.Text ->
                       output.DropdownOptions output.Text ->
@@ -366,6 +412,18 @@ let Ast/DropdownOption/Integer
       forall (cs : Ast/Constructors output) ->
         output.DropdownOption output.Integer
 
+let Ast/DropdownOption/Random/Natural
+    : Type
+    = forall (output : Ast/Output) ->
+      forall (cs : Ast/Constructors output) ->
+        output.DropdownOption (output.Random output.Natural)
+
+let Ast/DropdownOption/Random/Integer
+    : Type
+    = forall (output : Ast/Output) ->
+      forall (cs : Ast/Constructors output) ->
+        output.DropdownOption (output.Random output.Integer)
+
 let Ast/DropdownOption/Text
     : Type
     = forall (output : Ast/Output) ->
@@ -401,6 +459,18 @@ let Ast/DropdownOptions/Integer
     = forall (output : Ast/Output) ->
       forall (cs : Ast/Constructors output) ->
         output.DropdownOptions output.Integer
+
+let Ast/DropdownOptions/Random/Natural
+    : Type
+    = forall (output : Ast/Output) ->
+      forall (cs : Ast/Constructors output) ->
+        output.DropdownOptions (output.Random output.Natural)
+
+let Ast/DropdownOptions/Random/Integer
+    : Type
+    = forall (output : Ast/Output) ->
+      forall (cs : Ast/Constructors output) ->
+        output.DropdownOptions (output.Random output.Integer)
 
 let Ast/DropdownOptions/Text
     : Type
@@ -605,6 +675,7 @@ let Ast/render
 
                   in  { Natural = f
                       , Integer = f
+                      , Random = { Natural = f, Integer = f }
                       , Text = f
                       , TableEntries = f
                       , Table = f
@@ -618,6 +689,7 @@ let Ast/render
 
                   in  { Natural = f
                       , Integer = f
+                      , Random = { Natural = f, Integer = f }
                       , Text = f
                       , TableEntries = f
                       , Table = f
@@ -635,6 +707,7 @@ let Ast/render
 
                   in  { Natural = f
                       , Integer = f
+                      , Random = { Natural = f, Integer = f }
                       , Text = f
                       , TableEntries = f
                       , Table = f
@@ -671,6 +744,7 @@ let Ast/render
 
                     in  { Natural = f
                         , Integer = f
+                        , Random = { Natural = f, Integer = f }
                         , Text = f
                         , TableEntries = f
                         , Table = f
@@ -990,6 +1064,26 @@ let Ast/ToDropdownOption/Integer
           key
           (value output (\(d : Natural) -> cs (d + 1)))
 
+let Ast/ToDropdownOption/Random/Natural
+    : Text -> Ast/Random/Natural -> Ast/DropdownOption/Random/Natural
+    = \(key : Text) ->
+      \(value : Ast/Random/Natural) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).DropdownOption.Random.Natural
+          key
+          (value output (\(d : Natural) -> cs (d + 1)))
+
+let Ast/ToDropdownOption/Random/Integer
+    : Text -> Ast/Random/Integer -> Ast/DropdownOption/Random/Integer
+    = \(key : Text) ->
+      \(value : Ast/Random/Integer) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).DropdownOption.Random.Integer
+          key
+          (value output (\(d : Natural) -> cs (d + 1)))
+
 let Ast/ToDropdownOption/Text
     : Text -> Ast/Text -> Ast/DropdownOption/Text
     = \(key : Text) ->
@@ -1050,6 +1144,26 @@ let Ast/ToDropdownOptions/Integer
       \(cs : Ast/Constructors output) ->
         (cs 0).ToDropdownOptions.Integer (a output cs) (b output cs)
 
+let Ast/ToDropdownOptions/Random/Natural
+    : Ast/DropdownOption/Random/Natural ->
+      Ast/DropdownOption/Random/Natural ->
+        Ast/DropdownOptions/Random/Natural
+    = \(a : Ast/DropdownOption/Random/Natural) ->
+      \(b : Ast/DropdownOption/Random/Natural) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).ToDropdownOptions.Random.Natural (a output cs) (b output cs)
+
+let Ast/ToDropdownOptions/Random/Integer
+    : Ast/DropdownOption/Random/Integer ->
+      Ast/DropdownOption/Random/Integer ->
+        Ast/DropdownOptions/Random/Integer
+    = \(a : Ast/DropdownOption/Random/Integer) ->
+      \(b : Ast/DropdownOption/Random/Integer) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).ToDropdownOptions.Random.Integer (a output cs) (b output cs)
+
 let Ast/ToDropdownOptions/Text
     : Ast/DropdownOption/Text ->
       Ast/DropdownOption/Text ->
@@ -1105,6 +1219,22 @@ let Ast/Dropdown/Integer
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Dropdown.Integer name (options output cs)
+
+let Ast/Dropdown/Random/Natural
+    : Text -> Ast/DropdownOptions/Random/Natural -> Ast/Random/Natural
+    = \(name : Text) ->
+      \(options : Ast/DropdownOptions/Random/Natural) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Dropdown.Random.Natural name (options output cs)
+
+let Ast/Dropdown/Random/Integer
+    : Text -> Ast/DropdownOptions/Random/Integer -> Ast/Random/Integer
+    = \(name : Text) ->
+      \(options : Ast/DropdownOptions/Random/Integer) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Dropdown.Random.Integer name (options output cs)
 
 let Ast/Dropdown/Text
     : Text -> Ast/DropdownOptions/Text -> Ast/Text
@@ -1239,6 +1369,26 @@ let Ast/Cons/DropdownOptions/Integer
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Cons.DropdownOptions.Integer (x output cs) (xs output cs)
+
+let Ast/Cons/DropdownOptions/Random/Natural
+    : Ast/DropdownOption/Random/Natural ->
+      Ast/DropdownOptions/Random/Natural ->
+        Ast/DropdownOptions/Random/Natural
+    = \(x : Ast/DropdownOption/Random/Natural) ->
+      \(xs : Ast/DropdownOptions/Random/Natural) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Cons.DropdownOptions.Random.Natural (x output cs) (xs output cs)
+
+let Ast/Cons/DropdownOptions/Random/Integer
+    : Ast/DropdownOption/Random/Integer ->
+      Ast/DropdownOptions/Random/Integer ->
+        Ast/DropdownOptions/Random/Integer
+    = \(x : Ast/DropdownOption/Random/Integer) ->
+      \(xs : Ast/DropdownOptions/Random/Integer) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Cons.DropdownOptions.Random.Integer (x output cs) (xs output cs)
 
 let Ast/Cons/DropdownOptions/Text
     : Ast/DropdownOption/Text ->
