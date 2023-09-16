@@ -162,8 +162,22 @@ let Ast/Constructors =
                   output.DropdownOptions output.Command ->
                     output.Command
               }
-          , ToInteger : output.Natural -> output.Integer
-          , AbsoluteValue : output.Integer -> output.Natural
+          , ToInteger :
+              { Natural : output.Natural -> output.Integer
+              , Random :
+                  { Natural :
+                      output.Random output.Natural ->
+                        output.Random output.Integer
+                  }
+              }
+          , AbsoluteValue :
+              { Integer : output.Integer -> output.Natural
+              , Random :
+                  { Integer :
+                      output.Random output.Integer ->
+                        output.Random output.Natural
+                  }
+              }
           , Dice :
               { Natural :
                   output.Natural ->
@@ -626,8 +640,11 @@ let Ast/render
                       , Table = f
                       , Command = f
                       }
-              , ToInteger = Text/id
-              , AbsoluteValue = \(t : Text) -> "abs(${t})"
+              , ToInteger = { Natural = Text/id, Random.Natural = Text/id }
+              , AbsoluteValue =
+                  let f = \(t : Text) -> "abs(${t})"
+
+                  in  { Integer = f, Random.Integer = f }
               , Dice =
                 { Natural =
                     \(count : Text) -> \(sides : Text) -> "${count}d${sides}"
@@ -1121,19 +1138,33 @@ let Ast/Dropdown/Command
       \(cs : Ast/Constructors output) ->
         (cs 0).Dropdown.Command name (options output cs)
 
-let Ast/ToInteger
+let Ast/ToInteger/Natural
     : Ast/Natural -> Ast/Integer
     = \(x : Ast/Natural) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).ToInteger (x output cs)
+        (cs 0).ToInteger.Natural (x output cs)
 
-let Ast/AbsoluteValue
+let Ast/ToInteger/Random/Natural
+    : Ast/Random/Natural -> Ast/Random/Integer
+    = \(x : Ast/Random/Natural) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).ToInteger.Random.Natural (x output cs)
+
+let Ast/AbsoluteValue/Integer
     : Ast/Integer -> Ast/Natural
     = \(x : Ast/Integer) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).AbsoluteValue (x output cs)
+        (cs 0).AbsoluteValue.Integer (x output cs)
+
+let Ast/AbsoluteValue/Random/Integer
+    : Ast/Random/Integer -> Ast/Random/Natural
+    = \(x : Ast/Random/Integer) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).AbsoluteValue.Random.Integer (x output cs)
 
 let Ast/Dice/Natural
     : Ast/Natural -> Ast/Natural -> Ast/Random/Natural
@@ -1456,7 +1487,7 @@ let exampleAstBasicaMultiplication =
                       ( Ast/Show/Integer
                           ( Ast/Multiply/Integer
                               (Ast/Literal/Integer -3)
-                              (Ast/ToInteger (Ast/Literal/Natural 4))
+                              (Ast/ToInteger/Natural (Ast/Literal/Natural 4))
                           )
                       )
                   )
