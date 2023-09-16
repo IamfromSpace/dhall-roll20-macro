@@ -395,50 +395,100 @@ We define a `myCurrentStrength` value so it's easy to increment and regenerate o
 For trivial examples like these, functions probably don't help much.
 However, functions open a door to making extremely powerful macros that are reusable in many contexts.
 
-### Hello, multiple commands!
+### Multiple commands
 
-Our "Hello, world!" example at the moment mostly just makes us type a lot.
-So let's take a look at a more complex macro, one that does in fact use multiple commands.
-For our macro, we want to do three things: emote, broadcast, and roll.
+In our previous examples, we always use the `Ast.singleton/Commands`, even though it doesn't seem to do anything for us.
+Let's get a better understanding of how it can be useful by creating a macro with multiple commands: a typical attack roll.
+We want to do three things: emote, roll for attack (with a +4), and roll for damage (a d6).
 Let's see our finished macro first, and then we'll break it down.
 
 ```dhall
+-- Import the library
 let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main/src/package.dhall
 
-let emoteCommand : Ast.Command =
-  Ast.emote/Text
-    (Ast.literal/Text "greets the world.")
+-- Define a variable that represents rolling a six sided die.
+let d6 : Ast.Random/Natural =
+  -- How we create dice rolls, which always takes two Ast.Naturals
+  (Ast.dice/Natural
+    -- Create an Ast/Natural from regular Natural, the number of dice
+    (Ast.literal/Natural 1)
+    -- Create an Ast/Natural from regular Natural, the number of sides
+    (Ast.literal/Natural 6)
+  )
 
-let helloWorldCommand : Ast.Command =
-  Ast.broadcast/Text
-    (Ast.literal/Text "Hello, world!")
+-- Define a variable that represents rolling a 20 sided die.
+let d20 : Ast.Random/Natural =
+  -- How we create dice rolls, which always takes two Ast.Naturals
+  (Ast.dice/Natural
+    -- Create an Ast/Natural from regular Natural, the number of dice
+    (Ast.literal/Natural 1)
+    -- Create an Ast/Natural from regular Natural, the number of sides
+    (Ast.literal/Natural 20)
+  )
 
-let rollCommand : Ast.Command =
-  Ast.roll/Natural
-    (Ast.dice 
-      (Ast.value/Natural 1)
-      (Ast.value/Natural 20)
+-- Define "d20 + 4"
+let d20Plus4 : Ast.Random/Natural =
+  -- Say we're going to add two random things
+  Ast.add/Random/Natural
+    -- The left hand side, our die roll defined above
+    d20
+    -- The right hand side, a literal Natural (4) that we convert to a Random Natural
+    (Ast.toRandom/Natural
+      (Ast.literal/Natural 4)
     )
 
-let helloWorldCheck : Text =
-  Ast.render
+-- Create an emote based on static text
+let emoteCommand : Ast.Command =
+  Ast.emote/Text
+    (Ast.literal/Text "swings his sword!")
+
+-- Turn our d20Plus4 roll into a command
+let attackCommand : Ast.Command =
+  Ast.roll/Natural d20Plus4
+
+-- Turn our d6 roll into a command
+let damageCommand : Ast.Command =
+  Ast.roll/Natural d6
+
+-- Combine all of our individual commands together
+let attackCommands : Ast.Commands =
+  -- With cons, we can put a new command at the front of a set of commands
+  Ast.cons/Commands
+    emoteCommand
     (Ast.cons/Commands
-      emoteCommand
-      (Ast.cons/Commands
-        helloWorldCommand
-        (Ast.singleton/Commands
-          rollCommand
-        )
+      attackCommand
+      -- With singleton we start a list of commands from one
+      (Ast.singleton/Commands
+        damageCommand
       )
     )
 
-in assert : helloWorldCheck ===
-   ''
-   /em greets the world
-   Hello, world!
-   /r 1d20
-   ''
+-- Turn our list of commands into the final macro
+let attackMacro : Text =
+  Ast.render attackCommands
+
+-- For the purposes of this tutorial, a test validates the output
+let test =
+  assert : attackMacro ===
+    ''
+    /em swings his sword!
+    /r (1d20 + 4)
+    /r 1d6
+    ''
+
+-- Use the final macro as the output of this file
+in attackMacro
 ```
 
-Now we have something a lot more interesting!
-Structurally, we first create our three individual commands, we then construct a list out of them, and we then render the list to the final macro.
+Now we have something a pretty interesting!
+Our attack and damage rolls can be a lot more complex by mixing in previous and future concepts, but for now we just start with a static +4 to attack and damage of a 1d6.
+
+Creating each command and testing the output should look pretty familiar now, so let's jump right into how we combine our commands together.
+By using `Ast.cons/Commands` we can put a new command at the front of some previously defined list of commands.
+So we can stack these `Ast.cons/Commands` functions as much as we like, we just need a list of commands to start the process.
+To do that, we use what we've been using all along: `Ast.singleton/Command`, which can treat a single `Ast.Command` as if it were a list of commands (an `Ast.Commands`).
+
+Alternatively, if we have two lists of commands, we can use `Ast.plusPlus/Commands` to put the two lists together.
+This is handy in many cases, and the `Ast.cons/Commands` can't handle this situation!
+
+All together, we now have a macro that does multiple things for us all at once.
