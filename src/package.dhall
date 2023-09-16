@@ -541,7 +541,7 @@ let renderBroadcastAs = renderToCommand "as"
 
 let renderEmoteAs = renderToCommand "emas"
 
-let Ast/render
+let render
     : Ast/Commands -> Text
     = \(x : Ast/Commands) ->
         x
@@ -794,32 +794,32 @@ let Ast/render
               }
           )
 
-let Ast/Literal/Integer
+let literal/Integer
     : Integer -> Ast/Integer
     = \(x : Integer) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Literal.Integer x
 
-let Ast/Literal/Natural
+let literal/Natural
     : Natural -> Ast/Natural
     = \(x : Natural) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Literal.Natural x
 
-let Ast/Literal/Text
+let literal/Text
     : Text -> Ast/Text
     = \(x : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Literal.Text x
 
-let Ast/TableEntries/Empty
+let tableEntries/Empty
     : Ast/TableEntries
     = \(output : Ast/Output) -> \(cs : Ast/Constructors output) -> (cs 0).Empty
 
-let Ast/Singleton/TableEntries
+let singleton/TableEntries
     : Ast/Text -> Ast/Text -> Ast/TableEntries
     = \(key : Ast/Text) ->
       \(value : Ast/Text) ->
@@ -827,14 +827,14 @@ let Ast/Singleton/TableEntries
       \(cs : Ast/Constructors output) ->
         (cs 0).Singleton.TableEntries (key output cs) (value output cs)
 
-let Ast/Singleton/Commands
+let singleton/Commands
     : Ast/Command -> Ast/Commands
     = \(command : Ast/Command) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Singleton.Commands (command output cs)
 
-let Ast/ToTable
+let toTable
     : Optional Ast/Text -> Ast/TableEntries -> Ast/Table
     = \(optionalName : Optional Ast/Text) ->
       \(entries : Ast/TableEntries) ->
@@ -849,112 +849,112 @@ let Ast/ToTable
           )
           (entries output cs)
 
-let Ast/Macro/Integer
+let macro/Integer
     : Text -> Ast/Integer
     = \(x : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Macro.Integer x
 
-let Ast/Macro/Natural
+let macro/Natural
     : Text -> Ast/Natural
     = \(x : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Macro.Natural x
 
-let Ast/Macro/Text
+let macro/Text
     : Text -> Ast/Text
     = \(x : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Macro.Text x
 
-let Ast/Macro/Random/Integer
+let macro/Random/Integer
     : Text -> Ast/Random/Integer
     = \(x : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Macro.Random.Integer x
 
-let Ast/Macro/Random/Natural
+let macro/Random/Natural
     : Text -> Ast/Random/Natural
     = \(x : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Macro.Random.Natural x
 
-let Ast/Ability/Integer
+let ability/Integer
     : { char : Target, name : Text } -> Ast/Integer
     = \(x : { char : Target, name : Text }) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Ability.Integer x
 
-let Ast/Ability/Natural
+let ability/Natural
     : { char : Target, name : Text } -> Ast/Natural
     = \(x : { char : Target, name : Text }) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Ability.Natural x
 
-let Ast/Ability/Text
+let ability/Text
     : { char : Target, name : Text } -> Ast/Text
     = \(x : { char : Target, name : Text }) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Ability.Text x
 
-let Ast/Ability/Random/Integer
+let ability/Random/Integer
     : { char : Target, name : Text } -> Ast/Random/Integer
     = \(x : { char : Target, name : Text }) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Ability.Random.Integer x
 
-let Ast/Ability/Random/Natural
+let ability/Random/Natural
     : { char : Target, name : Text } -> Ast/Random/Natural
     = \(x : { char : Target, name : Text }) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Ability.Random.Natural x
 
-let Ast/Attribute/Integer
+let attribute/Integer
     : { char : Target, name : Text } -> Ast/Integer
     = \(x : { char : Target, name : Text }) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Attribute.Integer x
 
-let Ast/Attribute/Natural
+let attribute/Natural
     : { char : Target, name : Text } -> Ast/Natural
     = \(x : { char : Target, name : Text }) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Attribute.Natural x
 
-let Ast/Attribute/Random/Integer
+let attribute/Random/Integer
     : { char : Target, name : Text } -> Ast/Random/Integer
     = \(x : { char : Target, name : Text }) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Attribute.Random.Integer x
 
-let Ast/Attribute/Random/Natural
+let attribute/Random/Natural
     : { char : Target, name : Text } -> Ast/Random/Natural
     = \(x : { char : Target, name : Text }) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Attribute.Random.Natural x
 
-let Ast/Attribute/Text
+let attribute/Text
     : { char : Target, name : Text } -> Ast/Text
     = \(x : { char : Target, name : Text }) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Attribute.Text x
 
-let Ast/Input/Natural
+let input/Natural
     : Text -> Optional Ast/Natural -> Ast/Natural
     = \(name : Text) ->
       \(optionalDefault : Optional Ast/Natural) ->
@@ -969,7 +969,7 @@ let Ast/Input/Natural
               optionalDefault
           )
 
-let Ast/Input/Integer
+let input/Integer
     : Text -> Optional Ast/Integer -> Ast/Integer
     = \(name : Text) ->
       \(optionalDefault : Optional Ast/Integer) ->
@@ -984,7 +984,7 @@ let Ast/Input/Integer
               optionalDefault
           )
 
-let Ast/Input/Text
+let input/Text
     : Text -> Optional Ast/Text -> Ast/Text
     = \(name : Text) ->
       \(optionalDefault : Optional Ast/Text) ->
@@ -999,7 +999,7 @@ let Ast/Input/Text
               optionalDefault
           )
 
-let Ast/Input/Command
+let input/Command
     : Text -> Optional Ast/Command -> Ast/Command
     = \(name : Text) ->
       \(optionalDefault : Optional Ast/Command) ->
@@ -1014,7 +1014,7 @@ let Ast/Input/Command
               optionalDefault
           )
 
-let Ast/Input/Random/Natural
+let input/Random/Natural
     : Text -> Optional Ast/Random/Natural -> Ast/Random/Natural
     = \(name : Text) ->
       \(optionalDefault : Optional Ast/Random/Natural) ->
@@ -1029,7 +1029,7 @@ let Ast/Input/Random/Natural
               optionalDefault
           )
 
-let Ast/Input/Random/Integer
+let input/Random/Integer
     : Text -> Optional Ast/Random/Integer -> Ast/Random/Integer
     = \(name : Text) ->
       \(optionalDefault : Optional Ast/Random/Integer) ->
@@ -1044,7 +1044,7 @@ let Ast/Input/Random/Integer
               optionalDefault
           )
 
-let Ast/ToDropdownOption/Natural
+let toDropdownOption/Natural
     : Text -> Ast/Natural -> Ast/DropdownOption/Natural
     = \(key : Text) ->
       \(value : Ast/Natural) ->
@@ -1054,7 +1054,7 @@ let Ast/ToDropdownOption/Natural
           key
           (value output (\(d : Natural) -> cs (d + 1)))
 
-let Ast/ToDropdownOption/Integer
+let toDropdownOption/Integer
     : Text -> Ast/Integer -> Ast/DropdownOption/Integer
     = \(key : Text) ->
       \(value : Ast/Integer) ->
@@ -1064,7 +1064,7 @@ let Ast/ToDropdownOption/Integer
           key
           (value output (\(d : Natural) -> cs (d + 1)))
 
-let Ast/ToDropdownOption/Random/Natural
+let toDropdownOption/Random/Natural
     : Text -> Ast/Random/Natural -> Ast/DropdownOption/Random/Natural
     = \(key : Text) ->
       \(value : Ast/Random/Natural) ->
@@ -1074,7 +1074,7 @@ let Ast/ToDropdownOption/Random/Natural
           key
           (value output (\(d : Natural) -> cs (d + 1)))
 
-let Ast/ToDropdownOption/Random/Integer
+let toDropdownOption/Random/Integer
     : Text -> Ast/Random/Integer -> Ast/DropdownOption/Random/Integer
     = \(key : Text) ->
       \(value : Ast/Random/Integer) ->
@@ -1084,7 +1084,7 @@ let Ast/ToDropdownOption/Random/Integer
           key
           (value output (\(d : Natural) -> cs (d + 1)))
 
-let Ast/ToDropdownOption/Text
+let toDropdownOption/Text
     : Text -> Ast/Text -> Ast/DropdownOption/Text
     = \(key : Text) ->
       \(value : Ast/Text) ->
@@ -1094,7 +1094,7 @@ let Ast/ToDropdownOption/Text
           key
           (value output (\(d : Natural) -> cs (d + 1)))
 
-let Ast/ToDropdownOption/TableEntries
+let toDropdownOption/TableEntries
     : Text -> Ast/TableEntries -> Ast/DropdownOption/TableEntries
     = \(key : Text) ->
       \(value : Ast/TableEntries) ->
@@ -1104,7 +1104,7 @@ let Ast/ToDropdownOption/TableEntries
           key
           (value output (\(d : Natural) -> cs (d + 1)))
 
-let Ast/ToDropdownOption/Table
+let toDropdownOption/Table
     : Text -> Ast/Table -> Ast/DropdownOption/Table
     = \(key : Text) ->
       \(value : Ast/Table) ->
@@ -1114,7 +1114,7 @@ let Ast/ToDropdownOption/Table
           key
           (value output (\(d : Natural) -> cs (d + 1)))
 
-let Ast/ToDropdownOption/Command
+let toDropdownOption/Command
     : Text -> Ast/Command -> Ast/DropdownOption/Command
     = \(key : Text) ->
       \(value : Ast/Command) ->
@@ -1124,7 +1124,7 @@ let Ast/ToDropdownOption/Command
           key
           (value output (\(d : Natural) -> cs (d + 1)))
 
-let Ast/ToDropdownOptions/Natural
+let toDropdownOptions/Natural
     : Ast/DropdownOption/Natural ->
       Ast/DropdownOption/Natural ->
         Ast/DropdownOptions/Natural
@@ -1134,7 +1134,7 @@ let Ast/ToDropdownOptions/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).ToDropdownOptions.Natural (a output cs) (b output cs)
 
-let Ast/ToDropdownOptions/Integer
+let toDropdownOptions/Integer
     : Ast/DropdownOption/Integer ->
       Ast/DropdownOption/Integer ->
         Ast/DropdownOptions/Integer
@@ -1144,7 +1144,7 @@ let Ast/ToDropdownOptions/Integer
       \(cs : Ast/Constructors output) ->
         (cs 0).ToDropdownOptions.Integer (a output cs) (b output cs)
 
-let Ast/ToDropdownOptions/Random/Natural
+let toDropdownOptions/Random/Natural
     : Ast/DropdownOption/Random/Natural ->
       Ast/DropdownOption/Random/Natural ->
         Ast/DropdownOptions/Random/Natural
@@ -1154,7 +1154,7 @@ let Ast/ToDropdownOptions/Random/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).ToDropdownOptions.Random.Natural (a output cs) (b output cs)
 
-let Ast/ToDropdownOptions/Random/Integer
+let toDropdownOptions/Random/Integer
     : Ast/DropdownOption/Random/Integer ->
       Ast/DropdownOption/Random/Integer ->
         Ast/DropdownOptions/Random/Integer
@@ -1164,7 +1164,7 @@ let Ast/ToDropdownOptions/Random/Integer
       \(cs : Ast/Constructors output) ->
         (cs 0).ToDropdownOptions.Random.Integer (a output cs) (b output cs)
 
-let Ast/ToDropdownOptions/Text
+let toDropdownOptions/Text
     : Ast/DropdownOption/Text ->
       Ast/DropdownOption/Text ->
         Ast/DropdownOptions/Text
@@ -1174,7 +1174,7 @@ let Ast/ToDropdownOptions/Text
       \(cs : Ast/Constructors output) ->
         (cs 0).ToDropdownOptions.Text (a output cs) (b output cs)
 
-let Ast/ToDropdownOptions/TableEntries
+let toDropdownOptions/TableEntries
     : Ast/DropdownOption/TableEntries ->
       Ast/DropdownOption/TableEntries ->
         Ast/DropdownOptions/TableEntries
@@ -1184,7 +1184,7 @@ let Ast/ToDropdownOptions/TableEntries
       \(cs : Ast/Constructors output) ->
         (cs 0).ToDropdownOptions.TableEntries (a output cs) (b output cs)
 
-let Ast/ToDropdownOptions/Table
+let toDropdownOptions/Table
     : Ast/DropdownOption/Table ->
       Ast/DropdownOption/Table ->
         Ast/DropdownOptions/Table
@@ -1194,7 +1194,7 @@ let Ast/ToDropdownOptions/Table
       \(cs : Ast/Constructors output) ->
         (cs 0).ToDropdownOptions.Table (a output cs) (b output cs)
 
-let Ast/ToDropdownOptions/Command
+let toDropdownOptions/Command
     : Ast/DropdownOption/Command ->
       Ast/DropdownOption/Command ->
         Ast/DropdownOptions/Command
@@ -1204,7 +1204,7 @@ let Ast/ToDropdownOptions/Command
       \(cs : Ast/Constructors output) ->
         (cs 0).ToDropdownOptions.Command (a output cs) (b output cs)
 
-let Ast/Dropdown/Natural
+let dropdown/Natural
     : Text -> Ast/DropdownOptions/Natural -> Ast/Natural
     = \(name : Text) ->
       \(options : Ast/DropdownOptions/Natural) ->
@@ -1212,7 +1212,7 @@ let Ast/Dropdown/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).Dropdown.Natural name (options output cs)
 
-let Ast/Dropdown/Integer
+let dropdown/Integer
     : Text -> Ast/DropdownOptions/Integer -> Ast/Integer
     = \(name : Text) ->
       \(options : Ast/DropdownOptions/Integer) ->
@@ -1220,7 +1220,7 @@ let Ast/Dropdown/Integer
       \(cs : Ast/Constructors output) ->
         (cs 0).Dropdown.Integer name (options output cs)
 
-let Ast/Dropdown/Random/Natural
+let dropdown/Random/Natural
     : Text -> Ast/DropdownOptions/Random/Natural -> Ast/Random/Natural
     = \(name : Text) ->
       \(options : Ast/DropdownOptions/Random/Natural) ->
@@ -1228,7 +1228,7 @@ let Ast/Dropdown/Random/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).Dropdown.Random.Natural name (options output cs)
 
-let Ast/Dropdown/Random/Integer
+let dropdown/Random/Integer
     : Text -> Ast/DropdownOptions/Random/Integer -> Ast/Random/Integer
     = \(name : Text) ->
       \(options : Ast/DropdownOptions/Random/Integer) ->
@@ -1236,7 +1236,7 @@ let Ast/Dropdown/Random/Integer
       \(cs : Ast/Constructors output) ->
         (cs 0).Dropdown.Random.Integer name (options output cs)
 
-let Ast/Dropdown/Text
+let dropdown/Text
     : Text -> Ast/DropdownOptions/Text -> Ast/Text
     = \(name : Text) ->
       \(options : Ast/DropdownOptions/Text) ->
@@ -1244,7 +1244,7 @@ let Ast/Dropdown/Text
       \(cs : Ast/Constructors output) ->
         (cs 0).Dropdown.Text name (options output cs)
 
-let Ast/Dropdown/TableEntries
+let dropdown/TableEntries
     : Text -> Ast/DropdownOptions/TableEntries -> Ast/TableEntries
     = \(name : Text) ->
       \(options : Ast/DropdownOptions/TableEntries) ->
@@ -1252,7 +1252,7 @@ let Ast/Dropdown/TableEntries
       \(cs : Ast/Constructors output) ->
         (cs 0).Dropdown.TableEntries name (options output cs)
 
-let Ast/Dropdown/Table
+let dropdown/Table
     : Text -> Ast/DropdownOptions/Table -> Ast/Table
     = \(name : Text) ->
       \(options : Ast/DropdownOptions/Table) ->
@@ -1260,7 +1260,7 @@ let Ast/Dropdown/Table
       \(cs : Ast/Constructors output) ->
         (cs 0).Dropdown.Table name (options output cs)
 
-let Ast/Dropdown/Command
+let dropdown/Command
     : Text -> Ast/DropdownOptions/Command -> Ast/Command
     = \(name : Text) ->
       \(options : Ast/DropdownOptions/Command) ->
@@ -1268,35 +1268,35 @@ let Ast/Dropdown/Command
       \(cs : Ast/Constructors output) ->
         (cs 0).Dropdown.Command name (options output cs)
 
-let Ast/ToInteger/Natural
+let toInteger/Natural
     : Ast/Natural -> Ast/Integer
     = \(x : Ast/Natural) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).ToInteger.Natural (x output cs)
 
-let Ast/ToInteger/Random/Natural
+let toInteger/Random/Natural
     : Ast/Random/Natural -> Ast/Random/Integer
     = \(x : Ast/Random/Natural) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).ToInteger.Random.Natural (x output cs)
 
-let Ast/AbsoluteValue/Integer
+let absoluteValue/Integer
     : Ast/Integer -> Ast/Natural
     = \(x : Ast/Integer) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).AbsoluteValue.Integer (x output cs)
 
-let Ast/AbsoluteValue/Random/Integer
+let absoluteValue/Random/Integer
     : Ast/Random/Integer -> Ast/Random/Natural
     = \(x : Ast/Random/Integer) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).AbsoluteValue.Random.Integer (x output cs)
 
-let Ast/Dice/Natural
+let dice/Natural
     : Ast/Natural -> Ast/Natural -> Ast/Random/Natural
     = \(x : Ast/Natural) ->
       \(y : Ast/Natural) ->
@@ -1304,7 +1304,7 @@ let Ast/Dice/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).Dice.Natural (x output cs) (y output cs)
 
-let Ast/Dice/Random
+let dice/Random
     : Ast/Random/Natural -> Ast/Random/Natural -> Ast/Random/Natural
     = \(x : Ast/Random/Natural) ->
       \(y : Ast/Random/Natural) ->
@@ -1312,21 +1312,21 @@ let Ast/Dice/Random
       \(cs : Ast/Constructors output) ->
         (cs 0).Dice.Random (x output cs) (y output cs)
 
-let Ast/ToRandom/Natural
+let toRandom/Natural
     : Ast/Natural -> Ast/Random/Natural
     = \(x : Ast/Natural) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).ToRandom.Natural (x output cs)
 
-let Ast/ToRandom/Integer
+let toRandom/Integer
     : Ast/Integer -> Ast/Random/Integer
     = \(x : Ast/Integer) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).ToRandom.Integer (x output cs)
 
-let Ast/Label/Integer
+let label/Integer
     : Ast/Text -> Ast/Integer -> Ast/Integer
     = \(label : Ast/Text) ->
       \(x : Ast/Integer) ->
@@ -1334,7 +1334,7 @@ let Ast/Label/Integer
       \(cs : Ast/Constructors output) ->
         (cs 0).Labeled.Integer (label output cs) (x output cs)
 
-let Ast/Label/Natural
+let label/Natural
     : Ast/Text -> Ast/Natural -> Ast/Natural
     = \(label : Ast/Text) ->
       \(x : Ast/Natural) ->
@@ -1342,7 +1342,7 @@ let Ast/Label/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).Labeled.Natural (label output cs) (x output cs)
 
-let Ast/Cons/DropdownOptions/Natural
+let cons/DropdownOptions/Natural
     : Ast/DropdownOption/Natural ->
       Ast/DropdownOptions/Natural ->
         Ast/DropdownOptions/Natural
@@ -1352,7 +1352,7 @@ let Ast/Cons/DropdownOptions/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).Cons.DropdownOptions.Natural (x output cs) (xs output cs)
 
-let Ast/Cons/DropdownOptions/Integer
+let cons/DropdownOptions/Integer
     : Ast/DropdownOption/Integer ->
       Ast/DropdownOptions/Integer ->
         Ast/DropdownOptions/Integer
@@ -1362,7 +1362,7 @@ let Ast/Cons/DropdownOptions/Integer
       \(cs : Ast/Constructors output) ->
         (cs 0).Cons.DropdownOptions.Integer (x output cs) (xs output cs)
 
-let Ast/Cons/DropdownOptions/Random/Natural
+let cons/DropdownOptions/Random/Natural
     : Ast/DropdownOption/Random/Natural ->
       Ast/DropdownOptions/Random/Natural ->
         Ast/DropdownOptions/Random/Natural
@@ -1372,7 +1372,7 @@ let Ast/Cons/DropdownOptions/Random/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).Cons.DropdownOptions.Random.Natural (x output cs) (xs output cs)
 
-let Ast/Cons/DropdownOptions/Random/Integer
+let cons/DropdownOptions/Random/Integer
     : Ast/DropdownOption/Random/Integer ->
       Ast/DropdownOptions/Random/Integer ->
         Ast/DropdownOptions/Random/Integer
@@ -1382,7 +1382,7 @@ let Ast/Cons/DropdownOptions/Random/Integer
       \(cs : Ast/Constructors output) ->
         (cs 0).Cons.DropdownOptions.Random.Integer (x output cs) (xs output cs)
 
-let Ast/Cons/DropdownOptions/Text
+let cons/DropdownOptions/Text
     : Ast/DropdownOption/Text ->
       Ast/DropdownOptions/Text ->
         Ast/DropdownOptions/Text
@@ -1392,7 +1392,7 @@ let Ast/Cons/DropdownOptions/Text
       \(cs : Ast/Constructors output) ->
         (cs 0).Cons.DropdownOptions.Text (x output cs) (xs output cs)
 
-let Ast/Cons/DropdownOptions/TableEntries
+let cons/DropdownOptions/TableEntries
     : Ast/DropdownOption/TableEntries ->
       Ast/DropdownOptions/TableEntries ->
         Ast/DropdownOptions/TableEntries
@@ -1402,7 +1402,7 @@ let Ast/Cons/DropdownOptions/TableEntries
       \(cs : Ast/Constructors output) ->
         (cs 0).Cons.DropdownOptions.TableEntries (x output cs) (xs output cs)
 
-let Ast/Cons/DropdownOptions/Table
+let cons/DropdownOptions/Table
     : Ast/DropdownOption/Table ->
       Ast/DropdownOptions/Table ->
         Ast/DropdownOptions/Table
@@ -1412,7 +1412,7 @@ let Ast/Cons/DropdownOptions/Table
       \(cs : Ast/Constructors output) ->
         (cs 0).Cons.DropdownOptions.Table (x output cs) (xs output cs)
 
-let Ast/Cons/DropdownOptions/Command
+let cons/DropdownOptions/Command
     : Ast/DropdownOption/Command ->
       Ast/DropdownOptions/Command ->
         Ast/DropdownOptions/Command
@@ -1422,7 +1422,7 @@ let Ast/Cons/DropdownOptions/Command
       \(cs : Ast/Constructors output) ->
         (cs 0).Cons.DropdownOptions.Command (x output cs) (xs output cs)
 
-let Ast/Cons/Commands
+let cons/Commands
     : Ast/Command -> Ast/Commands -> Ast/Commands
     = \(command : Ast/Command) ->
       \(list : Ast/Commands) ->
@@ -1430,7 +1430,7 @@ let Ast/Cons/Commands
       \(cs : Ast/Constructors output) ->
         (cs 0).Cons.Commands (command output cs) (list output cs)
 
-let Ast/PlusPlus/Text
+let plusPlus/Text
     : Ast/Text -> Ast/Text -> Ast/Text
     = \(x : Ast/Text) ->
       \(y : Ast/Text) ->
@@ -1438,7 +1438,7 @@ let Ast/PlusPlus/Text
       \(cs : Ast/Constructors output) ->
         (cs 0).PlusPlus.Text (x output cs) (y output cs)
 
-let Ast/PlusPlus/TableEntries
+let plusPlus/TableEntries
     : Ast/TableEntries -> Ast/TableEntries -> Ast/TableEntries
     = \(x : Ast/TableEntries) ->
       \(y : Ast/TableEntries) ->
@@ -1446,7 +1446,7 @@ let Ast/PlusPlus/TableEntries
       \(cs : Ast/Constructors output) ->
         (cs 0).PlusPlus.TableEntries (x output cs) (y output cs)
 
-let Ast/PlusPlus/Table
+let plusPlus/Table
     : Ast/Table -> Ast/TableEntries -> Ast/Table
     = \(x : Ast/Table) ->
       \(y : Ast/TableEntries) ->
@@ -1454,7 +1454,7 @@ let Ast/PlusPlus/Table
       \(cs : Ast/Constructors output) ->
         (cs 0).PlusPlus.Table (x output cs) (y output cs)
 
-let Ast/PlusPlus/Commands
+let plusPlus/Commands
     : Ast/Commands -> Ast/Commands -> Ast/Commands
     = \(x : Ast/Commands) ->
       \(y : Ast/Commands) ->
@@ -1462,7 +1462,7 @@ let Ast/PlusPlus/Commands
       \(cs : Ast/Constructors output) ->
         (cs 0).PlusPlus.Commands (x output cs) (y output cs)
 
-let Ast/Add/Integer
+let add/Integer
     : Ast/Integer -> Ast/Integer -> Ast/Integer
     = \(x : Ast/Integer) ->
       \(y : Ast/Integer) ->
@@ -1470,7 +1470,7 @@ let Ast/Add/Integer
       \(cs : Ast/Constructors output) ->
         (cs 0).Add.Integer (x output cs) (y output cs)
 
-let Ast/Add/Natural
+let add/Natural
     : Ast/Natural -> Ast/Natural -> Ast/Natural
     = \(x : Ast/Natural) ->
       \(y : Ast/Natural) ->
@@ -1478,7 +1478,7 @@ let Ast/Add/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).Add.Natural (x output cs) (y output cs)
 
-let Ast/Add/Random/Natural
+let add/Random/Natural
     : Ast/Random/Natural -> Ast/Random/Natural -> Ast/Random/Natural
     = \(x : Ast/Random/Natural) ->
       \(y : Ast/Random/Natural) ->
@@ -1486,7 +1486,7 @@ let Ast/Add/Random/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).Add.Random.Natural (x output cs) (y output cs)
 
-let Ast/Add/Random/Integer
+let add/Random/Integer
     : Ast/Random/Integer -> Ast/Random/Integer -> Ast/Random/Integer
     = \(x : Ast/Random/Integer) ->
       \(y : Ast/Random/Integer) ->
@@ -1494,7 +1494,7 @@ let Ast/Add/Random/Integer
       \(cs : Ast/Constructors output) ->
         (cs 0).Add.Random.Integer (x output cs) (y output cs)
 
-let Ast/Multiply/Integer
+let multiply/Integer
     : Ast/Integer -> Ast/Integer -> Ast/Integer
     = \(x : Ast/Integer) ->
       \(y : Ast/Integer) ->
@@ -1502,7 +1502,7 @@ let Ast/Multiply/Integer
       \(cs : Ast/Constructors output) ->
         (cs 0).Multiply.Integer (x output cs) (y output cs)
 
-let Ast/Multiply/Natural
+let multiply/Natural
     : Ast/Natural -> Ast/Natural -> Ast/Natural
     = \(x : Ast/Natural) ->
       \(y : Ast/Natural) ->
@@ -1510,7 +1510,7 @@ let Ast/Multiply/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).Multiply.Natural (x output cs) (y output cs)
 
-let Ast/Multiply/Random/Integer
+let multiply/Random/Integer
     : Ast/Random/Integer -> Ast/Random/Integer -> Ast/Random/Integer
     = \(x : Ast/Random/Integer) ->
       \(y : Ast/Random/Integer) ->
@@ -1518,7 +1518,7 @@ let Ast/Multiply/Random/Integer
       \(cs : Ast/Constructors output) ->
         (cs 0).Multiply.Random.Integer (x output cs) (y output cs)
 
-let Ast/Multiply/Random/Natural
+let multiply/Random/Natural
     : Ast/Random/Natural -> Ast/Random/Natural -> Ast/Random/Natural
     = \(x : Ast/Random/Natural) ->
       \(y : Ast/Random/Natural) ->
@@ -1526,49 +1526,49 @@ let Ast/Multiply/Random/Natural
       \(cs : Ast/Constructors output) ->
         (cs 0).Multiply.Random.Natural (x output cs) (y output cs)
 
-let Ast/Show/Integer
+let show/Integer
     : Ast/Integer -> Ast/Text
     = \(x : Ast/Integer) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Show.Integer (x output cs)
 
-let Ast/Show/Natural
+let show/Natural
     : Ast/Natural -> Ast/Text
     = \(x : Ast/Natural) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Show.Natural (x output cs)
 
-let Ast/Show/Random/Natural
+let show/Random/Natural
     : Ast/Random/Natural -> Ast/Text
     = \(x : Ast/Random/Natural) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Show.Random.Natural (x output cs)
 
-let Ast/Show/Random/Integer
+let show/Random/Integer
     : Ast/Random/Integer -> Ast/Text
     = \(x : Ast/Random/Integer) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Show.Random.Integer (x output cs)
 
-let Ast/Broadcast/Text
+let broadcast/Text
     : Ast/Text -> Ast/Command
     = \(message : Ast/Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Broadcast.Text (message output cs)
 
-let Ast/Broadcast/Table
+let broadcast/Table
     : Ast/Table -> Ast/Command
     = \(message : Ast/Table) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Broadcast.Table (message output cs)
 
-let Ast/BroadcastAs/Text
+let broadcastAs/Text
     : Ast/Text -> Ast/Text -> Ast/Command
     = \(char : Ast/Text) ->
       \(message : Ast/Text) ->
@@ -1576,7 +1576,7 @@ let Ast/BroadcastAs/Text
       \(cs : Ast/Constructors output) ->
         (cs 0).BroadcastAs.Text (char output cs) (message output cs)
 
-let Ast/BroadcastAs/Table
+let broadcastAs/Table
     : Ast/Text -> Ast/Table -> Ast/Command
     = \(char : Ast/Text) ->
       \(message : Ast/Table) ->
@@ -1584,14 +1584,14 @@ let Ast/BroadcastAs/Table
       \(cs : Ast/Constructors output) ->
         (cs 0).BroadcastAs.Table (char output cs) (message output cs)
 
-let Ast/Emote
+let emote
     : Ast/Text -> Ast/Command
     = \(message : Ast/Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Emote (message output cs)
 
-let Ast/EmoteAs
+let emoteAs
     : Ast/Text -> Ast/Text -> Ast/Command
     = \(char : Ast/Text) ->
       \(message : Ast/Text) ->
@@ -1599,7 +1599,7 @@ let Ast/EmoteAs
       \(cs : Ast/Constructors output) ->
         (cs 0).EmoteAs (char output cs) (message output cs)
 
-let Ast/Whisper/Text
+let whisper/Text
     : Ast/Text -> Ast/Text -> Ast/Command
     = \(to : Ast/Text) ->
       \(message : Ast/Text) ->
@@ -1607,7 +1607,7 @@ let Ast/Whisper/Text
       \(cs : Ast/Constructors output) ->
         (cs 0).Whisper.Text (to output cs) (message output cs)
 
-let Ast/Whisper/Table
+let whisper/Table
     : Ast/Text -> Ast/Table -> Ast/Command
     = \(to : Ast/Text) ->
       \(message : Ast/Table) ->
@@ -1615,14 +1615,14 @@ let Ast/Whisper/Table
       \(cs : Ast/Constructors output) ->
         (cs 0).Whisper.Table (to output cs) (message output cs)
 
-let Ast/Roll/Natural
+let roll/Natural
     : Ast/Random/Natural -> Ast/Command
     = \(random : Ast/Random/Natural) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Roll.Natural (random output cs)
 
-let Ast/Roll/Integer
+let roll/Integer
     : Ast/Random/Integer -> Ast/Command
     = \(random : Ast/Random/Integer) ->
       \(output : Ast/Output) ->
@@ -1631,13 +1631,13 @@ let Ast/Roll/Integer
 
 let exampleAstBasicaMultiplication =
         assert
-      :     Ast/render
-              ( Ast/Singleton/Commands
-                  ( Ast/Broadcast/Text
-                      ( Ast/Show/Integer
-                          ( Ast/Multiply/Integer
-                              (Ast/Literal/Integer -3)
-                              (Ast/ToInteger/Natural (Ast/Literal/Natural 4))
+      :     render
+              ( singleton/Commands
+                  ( broadcast/Text
+                      ( show/Integer
+                          ( multiply/Integer
+                              (literal/Integer -3)
+                              (toInteger/Natural (literal/Natural 4))
                           )
                       )
                   )
@@ -1646,17 +1646,17 @@ let exampleAstBasicaMultiplication =
 
 let exampleAstUseTextualAttribute =
         assert
-      :     Ast/render
-              ( Ast/Singleton/Commands
-                  ( Ast/Broadcast/Text
-                      ( Ast/PlusPlus/Text
-                          ( Ast/PlusPlus/Text
-                              (Ast/Literal/Text "I called ")
-                              ( Ast/Attribute/Text
+      :     render
+              ( singleton/Commands
+                  ( broadcast/Text
+                      ( plusPlus/Text
+                          ( plusPlus/Text
+                              (literal/Text "I called ")
+                              ( attribute/Text
                                   { char = Target.Implicit, name = "attribute" }
                               )
                           )
-                          (Ast/Literal/Text " just now")
+                          (literal/Text " just now")
                       )
                   )
               )
@@ -1664,22 +1664,22 @@ let exampleAstUseTextualAttribute =
 
 let exampleAstSelectDiceSidesFromMathOnAttributesAndAbilities =
         assert
-      :     Ast/render
-              ( Ast/Singleton/Commands
-                  ( Ast/Roll/Natural
-                      ( Ast/Dice/Natural
-                          (Ast/Literal/Natural 4)
-                          ( Ast/Add/Natural
-                              ( Ast/Attribute/Natural
+      :     render
+              ( singleton/Commands
+                  ( roll/Natural
+                      ( dice/Natural
+                          (literal/Natural 4)
+                          ( add/Natural
+                              ( attribute/Natural
                                   { char = Target.Selected, name = "some_att" }
                               )
-                              ( Ast/Multiply/Natural
-                                  ( Ast/Ability/Natural
+                              ( multiply/Natural
+                                  ( ability/Natural
                                       { char = Target.Implicit
                                       , name = "some_ab"
                                       }
                                   )
-                                  (Ast/Literal/Natural 5)
+                                  (literal/Natural 5)
                               )
                           )
                       )
@@ -1689,17 +1689,17 @@ let exampleAstSelectDiceSidesFromMathOnAttributesAndAbilities =
 
 let exampleAstSelectDiceSidesARandomValue =
         assert
-      :     Ast/render
-              ( Ast/Singleton/Commands
-                  ( Ast/Roll/Natural
-                      ( Ast/Dice/Random
-                          (Ast/ToRandom/Natural (Ast/Literal/Natural 4))
-                          ( Ast/Add/Random/Natural
-                              ( Ast/Dice/Natural
-                                  (Ast/Literal/Natural 1)
-                                  (Ast/Literal/Natural 6)
+      :     render
+              ( singleton/Commands
+                  ( roll/Natural
+                      ( dice/Random
+                          (toRandom/Natural (literal/Natural 4))
+                          ( add/Random/Natural
+                              ( dice/Natural
+                                  (literal/Natural 1)
+                                  (literal/Natural 6)
                               )
-                              (Ast/ToRandom/Natural (Ast/Literal/Natural 2))
+                              (toRandom/Natural (literal/Natural 2))
                           )
                       )
                   )
@@ -1708,32 +1708,29 @@ let exampleAstSelectDiceSidesARandomValue =
 
 let exampleAstNestedStringQueries =
         assert
-      :     Ast/render
-              ( Ast/Singleton/Commands
-                  ( Ast/Broadcast/Text
-                      ( Ast/Dropdown/Text
+      :     render
+              ( singleton/Commands
+                  ( broadcast/Text
+                      ( dropdown/Text
                           "A"
-                          ( Ast/ToDropdownOptions/Text
-                              ( Ast/ToDropdownOption/Text
-                                  "1"
-                                  (Ast/Literal/Text "A1")
-                              )
-                              ( Ast/ToDropdownOption/Text
+                          ( toDropdownOptions/Text
+                              (toDropdownOption/Text "1" (literal/Text "A1"))
+                              ( toDropdownOption/Text
                                   "2"
-                                  ( Ast/PlusPlus/Text
-                                      ( Ast/Literal/Text
+                                  ( plusPlus/Text
+                                      ( literal/Text
                                           "You called the second level: "
                                       )
-                                      ( Ast/Dropdown/Text
+                                      ( dropdown/Text
                                           "B"
-                                          ( Ast/ToDropdownOptions/Text
-                                              ( Ast/ToDropdownOption/Text
+                                          ( toDropdownOptions/Text
+                                              ( toDropdownOption/Text
                                                   "1"
-                                                  (Ast/Literal/Text "A2B1")
+                                                  (literal/Text "A2B1")
                                               )
-                                              ( Ast/ToDropdownOption/Text
+                                              ( toDropdownOption/Text
                                                   "2"
-                                                  (Ast/Literal/Text "A2B2")
+                                                  (literal/Text "A2B2")
                                               )
                                           )
                                       )
@@ -1747,33 +1744,30 @@ let exampleAstNestedStringQueries =
 
 let exampleAstQueryDepthIsPreservedByTheConversionFromNaturalToText =
         assert
-      :     Ast/render
-              ( Ast/Singleton/Commands
-                  ( Ast/Broadcast/Text
-                      ( Ast/Dropdown/Text
+      :     render
+              ( singleton/Commands
+                  ( broadcast/Text
+                      ( dropdown/Text
                           "A"
-                          ( Ast/ToDropdownOptions/Text
-                              ( Ast/ToDropdownOption/Text
-                                  "1"
-                                  (Ast/Literal/Text "A1")
-                              )
-                              ( Ast/ToDropdownOption/Text
+                          ( toDropdownOptions/Text
+                              (toDropdownOption/Text "1" (literal/Text "A1"))
+                              ( toDropdownOption/Text
                                   "2"
-                                  ( Ast/PlusPlus/Text
-                                      ( Ast/Literal/Text
+                                  ( plusPlus/Text
+                                      ( literal/Text
                                           "You called the second level: "
                                       )
-                                      ( Ast/Show/Natural
-                                          ( Ast/Dropdown/Natural
+                                      ( show/Natural
+                                          ( dropdown/Natural
                                               "B"
-                                              ( Ast/ToDropdownOptions/Natural
-                                                  ( Ast/ToDropdownOption/Natural
+                                              ( toDropdownOptions/Natural
+                                                  ( toDropdownOption/Natural
                                                       "1"
-                                                      (Ast/Literal/Natural 1221)
+                                                      (literal/Natural 1221)
                                                   )
-                                                  ( Ast/ToDropdownOption/Natural
+                                                  ( toDropdownOption/Natural
                                                       "2"
-                                                      (Ast/Literal/Natural 1222)
+                                                      (literal/Natural 1222)
                                                   )
                                               )
                                           )
@@ -1788,25 +1782,25 @@ let exampleAstQueryDepthIsPreservedByTheConversionFromNaturalToText =
 
 let exampleAstDropdownOptionList =
         assert
-      :     Ast/render
-              ( Ast/Singleton/Commands
-                  ( Ast/Broadcast/Text
-                      ( Ast/Show/Natural
-                          ( Ast/Dropdown/Natural
+      :     render
+              ( singleton/Commands
+                  ( broadcast/Text
+                      ( show/Natural
+                          ( dropdown/Natural
                               "Dropdown"
-                              ( Ast/Cons/DropdownOptions/Natural
-                                  ( Ast/ToDropdownOption/Natural
+                              ( cons/DropdownOptions/Natural
+                                  ( toDropdownOption/Natural
                                       "A"
-                                      (Ast/Literal/Natural 1)
+                                      (literal/Natural 1)
                                   )
-                                  ( Ast/ToDropdownOptions/Natural
-                                      ( Ast/ToDropdownOption/Natural
+                                  ( toDropdownOptions/Natural
+                                      ( toDropdownOption/Natural
                                           "B"
-                                          (Ast/Literal/Natural 2)
+                                          (literal/Natural 2)
                                       )
-                                      ( Ast/ToDropdownOption/Natural
+                                      ( toDropdownOption/Natural
                                           "C"
-                                          (Ast/Literal/Natural 3)
+                                          (literal/Natural 3)
                                       )
                                   )
                               )
