@@ -52,16 +52,36 @@ let Ast/Constructors =
           , Macro :
               { Natural : Text -> output.Natural
               , Integer : Text -> output.Integer
+              , Random :
+                  { Natural : Text -> output.Random output.Natural
+                  , Integer : Text -> output.Random output.Integer
+                  }
               , Text : Text -> output.Text
               }
           , Ability :
               { Natural : { char : Target, name : Text } -> output.Natural
               , Integer : { char : Target, name : Text } -> output.Integer
+              , Random :
+                  { Natural :
+                      { char : Target, name : Text } ->
+                        output.Random output.Natural
+                  , Integer :
+                      { char : Target, name : Text } ->
+                        output.Random output.Integer
+                  }
               , Text : { char : Target, name : Text } -> output.Text
               }
           , Attribute :
               { Natural : { char : Target, name : Text } -> output.Natural
               , Integer : { char : Target, name : Text } -> output.Integer
+              , Random :
+                  { Natural :
+                      { char : Target, name : Text } ->
+                        output.Random output.Natural
+                  , Integer :
+                      { char : Target, name : Text } ->
+                        output.Random output.Integer
+                  }
               , Text : { char : Target, name : Text } -> output.Text
               }
           , EmptyInput :
@@ -388,8 +408,6 @@ let Ast/DropdownOptions/Command
       forall (cs : Ast/Constructors output) ->
         output.DropdownOptions output.Command
 
-let renderMacro = \(t : Text) -> "#${t}"
-
 let renderTarget =
       \(x : Target) ->
         merge
@@ -399,13 +417,9 @@ let renderTarget =
           }
           x
 
-let renderAbility =
-      \(x : { char : Target, name : Text }) ->
-        "%{${renderTarget x.char}${x.name}}"
+let inParens = \(x : Text) -> "(${x})"
 
-let renderAttribute =
-      \(x : { char : Target, name : Text }) ->
-        "@{${renderTarget x.char}${x.name}}"
+let inDoubleBrackets = \(x : Text) -> "[[${x}]]"
 
 let renderEscapeDepth =
       \(unescaped : Text) ->
@@ -499,20 +513,51 @@ let Ast/render
 
                     in  "&{template:default${escapedEndBracket} ${nameEntry}${entries}"
               , Macro =
-                { Natural = renderMacro
-                , Integer = renderMacro
-                , Text = renderMacro
-                }
+                  let f = \(t : Text) -> "#${t}"
+
+                  let fNum = \(t : Text) -> inParens (f t)
+
+                  let fRand = \(t : Text) -> inDoubleBrackets (f t)
+
+                  in  { Natural = fNum
+                      , Integer = fNum
+                      , Random = { Natural = fRand, Integer = fRand }
+                      , Text = f
+                      }
               , Ability =
-                { Natural = renderAbility
-                , Integer = renderAbility
-                , Text = renderAbility
-                }
+                  let f =
+                        \(x : { char : Target, name : Text }) ->
+                          "%{${renderTarget x.char}${x.name}}"
+
+                  let fNum =
+                        \(x : { char : Target, name : Text }) -> inParens (f x)
+
+                  let fRand =
+                        \(x : { char : Target, name : Text }) ->
+                          inDoubleBrackets (f x)
+
+                  in  { Natural = fNum
+                      , Integer = fNum
+                      , Random = { Natural = fRand, Integer = fRand }
+                      , Text = f
+                      }
               , Attribute =
-                { Natural = renderAttribute
-                , Integer = renderAttribute
-                , Text = renderAttribute
-                }
+                  let f =
+                        \(x : { char : Target, name : Text }) ->
+                          "@{${renderTarget x.char}${x.name}}"
+
+                  let fNum =
+                        \(x : { char : Target, name : Text }) -> inParens (f x)
+
+                  let fRand =
+                        \(x : { char : Target, name : Text }) ->
+                          inDoubleBrackets (f x)
+
+                  in  { Natural = fNum
+                      , Integer = fNum
+                      , Random = { Natural = fRand, Integer = fRand }
+                      , Text = f
+                      }
               , EmptyInput =
                   -- TODO: Let's just make the default optional
                   let f =
@@ -727,6 +772,20 @@ let Ast/Macro/Text
       \(cs : Ast/Constructors output) ->
         (cs 0).Macro.Text x
 
+let Ast/Macro/Random/Integer
+    : Text -> Ast/Random/Integer
+    = \(x : Text) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Macro.Random.Integer x
+
+let Ast/Macro/Random/Natural
+    : Text -> Ast/Random/Natural
+    = \(x : Text) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Macro.Random.Natural x
+
 let Ast/Ability/Integer
     : { char : Target, name : Text } -> Ast/Integer
     = \(x : { char : Target, name : Text }) ->
@@ -748,6 +807,20 @@ let Ast/Ability/Text
       \(cs : Ast/Constructors output) ->
         (cs 0).Ability.Text x
 
+let Ast/Ability/Random/Integer
+    : { char : Target, name : Text } -> Ast/Random/Integer
+    = \(x : { char : Target, name : Text }) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Ability.Random.Integer x
+
+let Ast/Ability/Random/Natural
+    : { char : Target, name : Text } -> Ast/Random/Natural
+    = \(x : { char : Target, name : Text }) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Ability.Random.Natural x
+
 let Ast/Attribute/Integer
     : { char : Target, name : Text } -> Ast/Integer
     = \(x : { char : Target, name : Text }) ->
@@ -761,6 +834,20 @@ let Ast/Attribute/Natural
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Attribute.Natural x
+
+let Ast/Attribute/Random/Integer
+    : { char : Target, name : Text } -> Ast/Random/Integer
+    = \(x : { char : Target, name : Text }) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Attribute.Random.Integer x
+
+let Ast/Attribute/Random/Natural
+    : { char : Target, name : Text } -> Ast/Random/Natural
+    = \(x : { char : Target, name : Text }) ->
+      \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Attribute.Random.Natural x
 
 let Ast/Attribute/Text
     : { char : Target, name : Text } -> Ast/Text
@@ -1380,7 +1467,7 @@ let exampleAstSelectDiceSidesFromMathOnAttributesAndAbilities =
                       )
                   )
               )
-        ===  "/r 4d(@{selected|some_att} + (%{some_ab} * 5))"
+        ===  "/r 4d((@{selected|some_att}) + ((%{some_ab}) * 5))"
 
 let exampleAstSelectDiceSidesARandomValue =
         assert
