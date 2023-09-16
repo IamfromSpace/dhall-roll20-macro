@@ -84,17 +84,11 @@ let Ast/Constructors =
                   }
               , Text : { char : Target, name : Text } -> output.Text
               }
-          , EmptyInput :
-              { Natural : Text -> output.Natural
-              , Integer : Text -> output.Integer
-              , Text : Text -> output.Text
-              , Command : Text -> output.Command
-              }
-          , DefaultedInput :
-              { Natural : Text -> output.Natural -> output.Natural
-              , Integer : Text -> output.Integer -> output.Integer
-              , Text : Text -> output.Text -> output.Text
-              , Command : Text -> output.Command -> output.Command
+          , Input :
+              { Natural : Text -> Optional output.Natural -> output.Natural
+              , Integer : Text -> Optional output.Integer -> output.Integer
+              , Text : Text -> Optional output.Text -> output.Text
+              , Command : Text -> Optional output.Command -> output.Command
               }
           , DropdownOption :
               { Natural :
@@ -558,21 +552,19 @@ let Ast/render
                       , Random = { Natural = fRand, Integer = fRand }
                       , Text = f
                       }
-              , EmptyInput =
-                  -- TODO: Let's just make the default optional
+              , Input =
                   let f =
                         \(name : Text) ->
-                          "?{" ++ name ++ renderQueryClosingBracket queryDepth
-
-                  in  { Natural = f, Integer = f, Text = f, Command = f }
-              , DefaultedInput =
-                  let f =
-                        \(name : Text) ->
-                        \(default : Text) ->
+                        \(optionalDefault : Optional Text) ->
                               "?{"
                           ++  name
-                          ++  renderQueryPipe queryDepth
-                          ++  default
+                          ++  merge
+                                { None = ""
+                                , Some =
+                                    \(default : Text) ->
+                                      renderQueryPipe queryDepth ++ default
+                                }
+                                optionalDefault
                           ++  renderQueryClosingBracket queryDepth
 
                   in  { Natural = f, Integer = f, Text = f, Command = f }
@@ -856,65 +848,65 @@ let Ast/Attribute/Text
       \(cs : Ast/Constructors output) ->
         (cs 0).Attribute.Text x
 
-let Ast/EmptyInput/Natural
-    : Text -> Ast/Natural
+let Ast/Input/Natural
+    : Text -> Optional Ast/Natural -> Ast/Natural
     = \(name : Text) ->
+      \(optionalDefault : Optional Ast/Natural) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).EmptyInput.Natural name
+        (cs 0).Input.Natural
+          name
+          ( Optional/map
+              Ast/Natural
+              output.Natural
+              (\(default : Ast/Natural) -> default output cs)
+              optionalDefault
+          )
 
-let Ast/EmptyInput/Integer
-    : Text -> Ast/Integer
+let Ast/Input/Integer
+    : Text -> Optional Ast/Integer -> Ast/Integer
     = \(name : Text) ->
+      \(optionalDefault : Optional Ast/Integer) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).EmptyInput.Integer name
+        (cs 0).Input.Integer
+          name
+          ( Optional/map
+              Ast/Integer
+              output.Integer
+              (\(default : Ast/Integer) -> default output cs)
+              optionalDefault
+          )
 
-let Ast/EmptyInput/Text
-    : Text -> Ast/Text
+let Ast/Input/Text
+    : Text -> Optional Ast/Text -> Ast/Text
     = \(name : Text) ->
+      \(optionalDefault : Optional Ast/Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).EmptyInput.Text name
+        (cs 0).Input.Text
+          name
+          ( Optional/map
+              Ast/Text
+              output.Text
+              (\(default : Ast/Text) -> default output cs)
+              optionalDefault
+          )
 
-let Ast/EmptyInput/Command
-    : Text -> Ast/Command
+let Ast/Input/Command
+    : Text -> Optional Ast/Command -> Ast/Command
     = \(name : Text) ->
+      \(optionalDefault : Optional Ast/Command) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).EmptyInput.Command name
-
-let Ast/DefaultedInput/Natural
-    : Text -> Ast/Natural -> Ast/Natural
-    = \(name : Text) ->
-      \(default : Ast/Natural) ->
-      \(output : Ast/Output) ->
-      \(cs : Ast/Constructors output) ->
-        (cs 0).DefaultedInput.Natural name (default output cs)
-
-let Ast/DefaultedInput/Integer
-    : Text -> Ast/Integer -> Ast/Integer
-    = \(name : Text) ->
-      \(default : Ast/Integer) ->
-      \(output : Ast/Output) ->
-      \(cs : Ast/Constructors output) ->
-        (cs 0).DefaultedInput.Integer name (default output cs)
-
-let Ast/DefaultedInput/Text
-    : Text -> Ast/Text -> Ast/Text
-    = \(name : Text) ->
-      \(default : Ast/Text) ->
-      \(output : Ast/Output) ->
-      \(cs : Ast/Constructors output) ->
-        (cs 0).DefaultedInput.Text name (default output cs)
-
-let Ast/DefaultedInput/Command
-    : Text -> Ast/Command -> Ast/Command
-    = \(name : Text) ->
-      \(default : Ast/Command) ->
-      \(output : Ast/Output) ->
-      \(cs : Ast/Constructors output) ->
-        (cs 0).DefaultedInput.Command name (default output cs)
+        (cs 0).Input.Command
+          name
+          ( Optional/map
+              Ast/Command
+              output.Command
+              (\(default : Ast/Command) -> default output cs)
+              optionalDefault
+          )
 
 let Ast/ToDropdownOption/Natural
     : Text -> Ast/Natural -> Ast/DropdownOption/Natural
