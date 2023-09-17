@@ -10,7 +10,25 @@ let Optional/map =
 let Text/replicate =
       https://raw.githubusercontent.com/dhall-lang/dhall-lang/v21.1.0/Prelude/Text/replicate.dhall
 
+let List/drop =
+      https://raw.githubusercontent.com/dhall-lang/dhall-lang/v21.1.0/Prelude/List/drop.dhall
+
+let List/foldLeft =
+      https://raw.githubusercontent.com/dhall-lang/dhall-lang/v21.1.0/Prelude/List/foldLeft.dhall
+
 let Text/id = \(x : Text) -> x
+
+let List/monoFold =
+      \(a : Type) ->
+      \(xs : List a) ->
+      \(mappend : a -> a -> a) ->
+      \(mempty : a) ->
+        merge
+          { None = mempty
+          , Some =
+              \(first : a) -> List/foldLeft a (List/drop 1 a xs) a mappend first
+          }
+          (List/head a xs)
 
 let Target = < Selected | Named : Text | Implicit >
 
@@ -1498,6 +1516,34 @@ let add/Random/Integer
       \(cs : Ast/Constructors output) ->
         (cs 0).Add.Random.Integer (x output cs) (y output cs)
 
+let sum/Integer
+    : List Ast/Integer -> Ast/Integer
+    = \(list : List Ast/Integer) ->
+        List/monoFold Ast/Integer list add/Integer (literal/Integer +0)
+
+let sum/Natural
+    : List Ast/Natural -> Ast/Natural
+    = \(list : List Ast/Natural) ->
+        List/monoFold Ast/Natural list add/Natural (literal/Natural 0)
+
+let sum/Random/Integer
+    : List Ast/Random/Integer -> Ast/Random/Integer
+    = \(list : List Ast/Random/Integer) ->
+        List/monoFold
+          Ast/Random/Integer
+          list
+          add/Random/Integer
+          (toRandom/Integer (literal/Integer +0))
+
+let sum/Random/Natural
+    : List Ast/Random/Natural -> Ast/Random/Natural
+    = \(list : List Ast/Random/Natural) ->
+        List/monoFold
+          Ast/Random/Natural
+          list
+          add/Random/Natural
+          (toRandom/Natural (literal/Natural 0))
+
 let multiply/Integer
     : Ast/Integer -> Ast/Integer -> Ast/Integer
     = \(x : Ast/Integer) ->
@@ -1529,6 +1575,34 @@ let multiply/Random/Natural
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Multiply.Random.Natural (x output cs) (y output cs)
+
+let product/Integer
+    : List Ast/Integer -> Ast/Integer
+    = \(list : List Ast/Integer) ->
+        List/monoFold Ast/Integer list multiply/Integer (literal/Integer +1)
+
+let product/Natural
+    : List Ast/Natural -> Ast/Natural
+    = \(list : List Ast/Natural) ->
+        List/monoFold Ast/Natural list multiply/Natural (literal/Natural 1)
+
+let product/Random/Integer
+    : List Ast/Random/Integer -> Ast/Random/Integer
+    = \(list : List Ast/Random/Integer) ->
+        List/monoFold
+          Ast/Random/Integer
+          list
+          multiply/Random/Integer
+          (toRandom/Integer (literal/Integer +1))
+
+let product/Random/Natural
+    : List Ast/Random/Natural -> Ast/Random/Natural
+    = \(list : List Ast/Random/Natural) ->
+        List/monoFold
+          Ast/Random/Natural
+          list
+          multiply/Random/Natural
+          (toRandom/Natural (literal/Natural 1))
 
 let show/Integer
     : Ast/Integer -> Ast/Text
@@ -1647,6 +1721,43 @@ let exampleAstBasicaMultiplication =
                   )
               )
         ===  "[[((-3) * 4)]]"
+
+let exampleSum0 =
+        assert
+      :     render
+              ( singleton/Commands
+                  ( roll/Integer
+                      (toRandom/Integer (sum/Integer ([] : List Ast/Integer)))
+                  )
+              )
+        ===  "/r 0"
+
+let exampleSum1 =
+        assert
+      :     render
+              ( singleton/Commands
+                  ( roll/Integer
+                      (toRandom/Integer (sum/Integer [ literal/Integer +1 ]))
+                  )
+              )
+        ===  "/r 1"
+
+let exampleSumN =
+        assert
+      :     render
+              ( singleton/Commands
+                  ( roll/Integer
+                      ( toRandom/Integer
+                          ( sum/Integer
+                              [ literal/Integer +1
+                              , literal/Integer -2
+                              , literal/Integer +3
+                              ]
+                          )
+                      )
+                  )
+              )
+        ===  "/r ((1 + (-2)) + 3)"
 
 let exampleAstUseTextualAttribute =
         assert
