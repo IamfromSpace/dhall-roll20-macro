@@ -394,6 +394,7 @@ We define a `myCurrentStrength` value so it's easy to increment and regenerate o
 
 For trivial examples like these, functions probably don't help much.
 However, functions open a door to making extremely powerful macros that are reusable in many contexts.
+As an example, if we instead make our function accept an `Ast.Natural`, we can have our cake and eat it to: we can decide later if we want to use static value, or reference an attribute, or use it both ways!
 
 ### Input boxes
 
