@@ -509,3 +509,106 @@ let attackCommands : Ast.Commands =
 Much nicer!
 
 All together, we now have a macro that does multiple things for us all at once.
+
+### Complex Text
+
+The previous macro was starting to look useful, but it's not the most attractive way to present the two rolls.
+We also don't label what the rolls are, which is going to be challenging to decipher if we need to add more.
+Combining learnings from previous sections we could add additional commands that broadcast text before each roll to act as a label.
+But instead, let's do something new and put all our rolls in a single line embedded in text.
+We'll drop the emote for now, but you could add this in if you wanted.
+Here's the finished macro, which we'll then break down.
+
+```dhall
+-- Import the library
+let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main/src/package.dhall
+
+-- Define a variable that represents rolling a six sided die.
+let d6 : Ast.Random/Natural =
+  -- How we create dice rolls, which always takes two Ast.Naturals
+  (Ast.dice/Natural
+    -- Create an Ast/Natural from regular Natural, the number of dice
+    (Ast.literal/Natural 1)
+    -- Create an Ast/Natural from regular Natural, the number of sides
+    (Ast.literal/Natural 6)
+  )
+
+-- Define a variable that represents rolling a 20 sided die.
+let d20 : Ast.Random/Natural =
+  -- How we create dice rolls, which always takes two Ast.Naturals
+  (Ast.dice/Natural
+    -- Create an Ast/Natural from regular Natural, the number of dice
+    (Ast.literal/Natural 1)
+    -- Create an Ast/Natural from regular Natural, the number of sides
+    (Ast.literal/Natural 20)
+  )
+
+-- Define "d20 + 4"
+let d20Plus4 : Ast.Random/Natural =
+  -- Say we're going to add two random things
+  Ast.add/Random/Natural
+    -- The left hand side, our die roll defined above
+    d20
+    -- The right hand side, a literal Natural (4) that we convert to a Random Natural
+    (Ast.toRandom/Natural
+      (Ast.literal/Natural 4)
+    )
+
+-- Create a complex piece of text out of multiple pieces
+-- NOTE: Like with cons/fromList we'll show a more readable way to do this
+let attackWithDamage : Ast.Text =
+  -- Continually chain together the joining of text
+  Ast.plusPlus/Text
+    (Ast.literal/Text "Attack: ")
+    (Ast.plusPlus/Text
+      -- Convert our d20Plus4 random value into a Ast.Text
+      (Ast.show/Random/Natural d20Plus4)
+      (Ast.plusPlus/Text
+        (Ast.literal/Text "; Damage: ")
+        (Ast.plusPlus/Text
+          -- Convert our d6 random value into a Ast.Text
+          (Ast.show/Random/Natural d6)
+          (Ast.literal/Text ".")
+        )
+      )
+    )
+
+-- Turn our command into the final broadcasting macro
+let attackWithDamageMacro : Text =
+  Ast.render
+    (Ast.singleton/Commands
+      (Ast.broadcast/Text attackWithDamage)
+    )
+
+-- For the purposes of this tutorial, a test validates the output
+let test =
+  assert : attackWithDamageMacro ===
+    "Attack: [[(1d20 + 4)]]; Damage: [[1d6]]."
+
+-- Use the final macro as the output of this file
+in attackWithDamageMacro
+```
+
+When joining two pieces of text, like doing math, we use Polish notation, so the function comes first then the left hand text and then finally the right hand text.
+With this many elements all joined together, our nesting gets pretty hard to read.
+So lets immediately see how we can make this more readable with `Ast.concat/Text`.
+
+```dhall
+-- Create a complex piece of text out of multiple pieces
+let attackWithDamage : Ast.Text =
+  -- Join together multiple pieces of Ast.Text
+  Ast.concat/Text
+    [ Ast.literal/Text "Attack: "
+    , Ast.show/Random/Natural d20Plus4
+    , Ast.literal/Text "; Damage: "
+    , Ast.show/Random/Natural d6
+    , Ast.literal/Text "."
+    ]
+```
+
+That's at least a little easier on the eyes.
+This function still expects that each item in the list is of type `Ast.Text`, so that's where the remaining work is done.
+We use `Ast.literal/Text` to convert static pieces of text, and we use `Ast.show/Random/Natural` to convert our dice rolls into text.
+
+We convert this into a command by saying we want to broadcast it, turn that command into a list of commands, and finally render it to the final macro, give that a test, and then output it.
+Popping that result into roll20 we get a nicely formatted output all on a single line!
