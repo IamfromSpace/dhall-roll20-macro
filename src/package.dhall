@@ -1484,6 +1484,25 @@ let plusPlus/Commands
       \(cs : Ast/Constructors output) ->
         (cs 0).PlusPlus.Commands (x output cs) (y output cs)
 
+let concat/Text
+    : List Ast/Text -> Ast/Text
+    = \(list : List Ast/Text) ->
+        List/monoFold Ast/Text list plusPlus/Text (literal/Text "")
+
+let concat/TableEntries
+    : List Ast/TableEntries -> Ast/TableEntries
+    = \(list : List Ast/TableEntries) ->
+        List/monoFold
+          Ast/TableEntries
+          list
+          plusPlus/TableEntries
+          empty/TableEntries
+
+let concat/Commands
+    : List Ast/Commands -> Ast/Commands
+    = \(list : List Ast/Commands) ->
+        List/monoFold Ast/Commands list plusPlus/Commands empty/Commands
+
 let add/Integer
     : Ast/Integer -> Ast/Integer -> Ast/Integer
     = \(x : Ast/Integer) ->
@@ -1721,6 +1740,37 @@ let exampleAstBasicaMultiplication =
                   )
               )
         ===  "[[((-3) * 4)]]"
+
+let exampleConcatText0 =
+        assert
+      :     render
+              ( singleton/Commands
+                  (broadcast/Text (concat/Text ([] : List Ast/Text)))
+              )
+        ===  ""
+
+let exampleConcatText1 =
+        assert
+      :     render
+              ( singleton/Commands
+                  (broadcast/Text (concat/Text [ literal/Text "a" ]))
+              )
+        ===  "a"
+
+let exampleConcatTextN =
+        assert
+      :     render
+              ( singleton/Commands
+                  ( broadcast/Text
+                      ( concat/Text
+                          [ literal/Text "a"
+                          , literal/Text "b"
+                          , literal/Text "c"
+                          ]
+                      )
+                  )
+              )
+        ===  "abc"
 
 let exampleSum0 =
         assert
