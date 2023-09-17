@@ -395,6 +395,121 @@ We define a `myCurrentStrength` value so it's easy to increment and regenerate o
 For trivial examples like these, functions probably don't help much.
 However, functions open a door to making extremely powerful macros that are reusable in many contexts.
 
+### Input boxes
+
+In some cases, we don't just want something that can change over time, we want something that can change each time we use it.
+For simple cases, an input box is a great way to handle this.
+We'll also explore dropdown inputs later, but these are much more advanced.
+For the moment, we'll add the ability to add situational modifiers for our attack above.
+Rather than always have a +4 to attack, we'll start with that as a baseline, and then prompt the user to add any current situational modifiers.
+To help them out, we'll also default this to 0, so they can just quickly press okay during typical circumstances.
+
+```dhall
+-- Import the library
+let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main/src/package.dhall
+
+-- Define a variable that represents rolling a 20 sided die.
+let d20 : Ast.Random/Natural =
+  -- How we create dice rolls, which always takes two Ast.Naturals
+  (Ast.dice/Natural
+    -- Create an Ast/Natural from regular Natural, the number of dice
+    (Ast.literal/Natural 1)
+    -- Create an Ast/Natural from regular Natural, the number of sides
+    (Ast.literal/Natural 20)
+  )
+
+-- Define "d20 + 4 + a value from an input"
+let d20Plus4PlusModifier : Ast.Random/Integer =
+  -- Add two random Integers
+  Ast.add/Random/Integer
+    (Ast.toInteger/Random d20)
+    -- Our two modifiers are regular Integers, we convert the sum to a Random Integer
+    (Ast.toRandom/Integer
+      -- Add together two Integer numbers
+      (Ast.add/Integer
+        -- The first is a static value: 4
+        (Ast.literal/Integer +4)
+        -- The second is an input
+        (Ast.input/Integer
+          -- The name of this input is "Modifier"
+          "Modifier"
+          -- There is a default input, which we indicate via Some
+          (Some
+            -- The default input is the static value 0
+            (Ast.literal/Integer +0)
+          )
+        )
+      )
+    )
+
+-- Define a variable that says what to do with our check: broadcast it!
+let dynamicCheckCommand : Ast.Command =
+  Ast.roll/Random/Integer d20Plus4PlusModifier
+
+-- Define a variable with finished macro
+let dynamicCheckMacro : Text =
+  -- Turn the commands into a finished macro
+  Ast.render
+    -- Turn our single command into the multiple commands type
+    (Ast.singleton/Commands dynamicCheckCommand)
+
+-- For the purposes of this tutorial, a test validates the output
+let test =
+  assert : dynamicCheckMacro === "/r (1d20 + (4 + ?{Modifier|0}))"
+
+-- Use the final macro as the output of this file
+in dynamicCheckMacro
+```
+
+Now we have something that can be adjusted on the fly during a game.
+Each time the macro executes, the user is prompted for the Modifier, which is added to the check.
+We can see that defining `d20Plus4PlusModifier` has a number of steps involved.
+You'll note that this time, we're not using Naturals, we're using Integers.
+We do this because there's a decent chance the user will enter a negative number into an input, due to adverse situational effects.
+We can't be sure exactly what the user will enter into the input, but if we use the type that's most likely to match, or macro is much more likely to behave correctly.
+
+Alternatively, to using two different add functions, we can use `Ast.sum/Random/Integer` to sum over a list, in order to avoid nesting addition functions.
+If we rewrite it with this, we get the following.
+
+```dhall
+let d20Plus4PlusModifier : Ast.Random/Integer =
+  Ast.sum/Random/Integer
+    [ Ast.toInteger/Random d20
+    , Ast.toRandom/Integer
+        (Ast.literal/Integer +4)
+    , Ast.toRandom/Integer
+        (Ast.input/Integer
+          "Modifier"
+          (Some
+            (Ast.literal/Integer +0)
+          )
+        )
+    ]
+```
+
+This helps illustrate that we're adding together three terms.
+The first is the d20 roll, which produces a random Natural.
+Since we're summing Integers, we need to use `Ast.toInteger/Random` to convert it.
+It's free to convert Naturals to Integers, just not the other way around!
+
+The second and third terms are of the `Ast.Integer` type, but they need to be of the `Ast.Random/Integer` type so all the types in the list match.
+We convert them via the `Ast.toRandom/Integer` function.
+The second term is just our static +4 strength bonus.
+In Dhall, we need to prefix the sign when defining an Integer, so this is why we write `+4` instead of just `4`.
+
+The third term is the where we define a user input with a default.
+We use the `Ast.input/Integer` because the user could enter a positive or negative number.
+We can't be sure what they'll actually enter, but by using this function it will work if they enter anything like `-3` or `(-3)` or `4-5` or `+4`.
+
+Each user input needs a name (using the same name twice results in roll20 remembering the previous choice), we call this one just "Modifier."
+And then we define our optional default input.
+Optional types are tagged `Some` or `None`.
+If don't want a default, we would say `None` and then the associated type, so here it would be `None Ast/Integer`.
+Since we want a default, we use the function `Some` and pass it the static Integer +0.
+
+We've done quite a lot all told, but in the end, the macro user has a very convenient experience.
+When they call the macro, they don't have to do mental math on the result to account for the current game state, they just enter in the modifier the accounts for the current situation.
+
 ### Multiple commands
 
 In our previous examples, we always use the `Ast.singleton/Commands`, even though it doesn't seem to do anything for us.
