@@ -276,7 +276,7 @@ let d20 : Ast.Random/Natural =
     (Ast.literal/Natural 20)
   )
 
--- Define "d20 + 4"
+-- Define d20 + strength modifier
 let d20PlusStrength : Ast.Random/Natural =
   -- Say we're going to add two random things
   Ast.add/Random/Natural
