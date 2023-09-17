@@ -42,7 +42,8 @@ let Ast/Constructors =
               , Integer : Integer -> output.Integer
               , Text : Text -> output.Text
               }
-          , Empty : output.TableEntries
+          , Empty :
+              { TableEntries : output.TableEntries, Commands : output.Commands }
           , Singleton :
               { TableEntries : output.Text -> output.Text -> output.TableEntries
               , Commands : output.Command -> output.Commands
@@ -566,7 +567,7 @@ let render
                       else  "(${Integer/show x})"
                 , Text = \(x : Text) -> x
                 }
-              , Empty = ""
+              , Empty = { TableEntries = "", Commands = "" }
               , Singleton =
                 { TableEntries =
                     \(key : Text) ->
@@ -810,9 +811,17 @@ let literal/Text
       \(cs : Ast/Constructors output) ->
         (cs 0).Literal.Text x
 
-let tableEntries/Empty
+let empty/TableEntries
     : Ast/TableEntries
-    = \(output : Ast/Output) -> \(cs : Ast/Constructors output) -> (cs 0).Empty
+    = \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Empty.TableEntries
+
+let empty/Commands
+    : Ast/Commands
+    = \(output : Ast/Output) ->
+      \(cs : Ast/Constructors output) ->
+        (cs 0).Empty.Commands
 
 let singleton/TableEntries
     : Ast/Text -> Ast/Text -> Ast/TableEntries
