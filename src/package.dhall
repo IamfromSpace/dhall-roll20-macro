@@ -1452,6 +1452,114 @@ let cons/Commands
       \(cs : Ast/Constructors output) ->
         (cs 0).Cons.Commands (command output cs) (list output cs)
 
+let fromList2 =
+      \(t : Type) ->
+      \(ts : Type) ->
+      \(f : t -> ts -> ts) ->
+      \(toAs : t -> t -> ts) ->
+      \(last : t) ->
+      \(secondToLast : t) ->
+      \(list : List t) ->
+        List/foldLeft
+          t
+          list
+          ts
+          (\(xs : ts) -> \(x : t) -> f x xs)
+          (toAs secondToLast last)
+
+let fromList2/DropdownOptions/Natural
+    : Ast/DropdownOption/Natural ->
+      Ast/DropdownOption/Natural ->
+      List Ast/DropdownOption/Natural ->
+        Ast/DropdownOptions/Natural
+    = fromList2
+        Ast/DropdownOption/Natural
+        Ast/DropdownOptions/Natural
+        cons/DropdownOptions/Natural
+        toDropdownOptions/Natural
+
+let fromList2/DropdownOptions/Integer
+    : Ast/DropdownOption/Integer ->
+      Ast/DropdownOption/Integer ->
+      List Ast/DropdownOption/Integer ->
+        Ast/DropdownOptions/Integer
+    = fromList2
+        Ast/DropdownOption/Integer
+        Ast/DropdownOptions/Integer
+        cons/DropdownOptions/Integer
+        toDropdownOptions/Integer
+
+let fromList2/DropdownOptions/Random/Natural
+    : Ast/DropdownOption/Random/Natural ->
+      Ast/DropdownOption/Random/Natural ->
+      List Ast/DropdownOption/Random/Natural ->
+        Ast/DropdownOptions/Random/Natural
+    = fromList2
+        Ast/DropdownOption/Random/Natural
+        Ast/DropdownOptions/Random/Natural
+        cons/DropdownOptions/Random/Natural
+        toDropdownOptions/Random/Natural
+
+let fromList2/DropdownOptions/Random/Integer
+    : Ast/DropdownOption/Random/Integer ->
+      Ast/DropdownOption/Random/Integer ->
+      List Ast/DropdownOption/Random/Integer ->
+        Ast/DropdownOptions/Random/Integer
+    = fromList2
+        Ast/DropdownOption/Random/Integer
+        Ast/DropdownOptions/Random/Integer
+        cons/DropdownOptions/Random/Integer
+        toDropdownOptions/Random/Integer
+
+let fromList2/DropdownOptions/Text
+    : Ast/DropdownOption/Text ->
+      Ast/DropdownOption/Text ->
+      List Ast/DropdownOption/Text ->
+        Ast/DropdownOptions/Text
+    = fromList2
+        Ast/DropdownOption/Text
+        Ast/DropdownOptions/Text
+        cons/DropdownOptions/Text
+        toDropdownOptions/Text
+
+let fromList2/DropdownOptions/TableEntries
+    : Ast/DropdownOption/TableEntries ->
+      Ast/DropdownOption/TableEntries ->
+      List Ast/DropdownOption/TableEntries ->
+        Ast/DropdownOptions/TableEntries
+    = fromList2
+        Ast/DropdownOption/TableEntries
+        Ast/DropdownOptions/TableEntries
+        cons/DropdownOptions/TableEntries
+        toDropdownOptions/TableEntries
+
+let fromList2/DropdownOptions/Table
+    : Ast/DropdownOption/Table ->
+      Ast/DropdownOption/Table ->
+      List Ast/DropdownOption/Table ->
+        Ast/DropdownOptions/Table
+    = fromList2
+        Ast/DropdownOption/Table
+        Ast/DropdownOptions/Table
+        cons/DropdownOptions/Table
+        toDropdownOptions/Table
+
+let fromList2/DropdownOptions/Command
+    : Ast/DropdownOption/Command ->
+      Ast/DropdownOption/Command ->
+      List Ast/DropdownOption/Command ->
+        Ast/DropdownOptions/Command
+    = fromList2
+        Ast/DropdownOption/Command
+        Ast/DropdownOptions/Command
+        cons/DropdownOptions/Command
+        toDropdownOptions/Command
+
+let fromList/Commands
+    : List Ast/Command -> Ast/Commands
+    = \(list : List Ast/Command) ->
+        List/fold Ast/Command list Ast/Commands cons/Commands empty/Commands
+
 let plusPlus/Text
     : Ast/Text -> Ast/Text -> Ast/Text
     = \(x : Ast/Text) ->
@@ -1740,6 +1848,84 @@ let exampleAstBasicaMultiplication =
                   )
               )
         ===  "[[((-3) * 4)]]"
+
+let exampleFromList2DropdownText2 =
+        assert
+      :     render
+              ( singleton/Commands
+                  ( broadcast/Text
+                      ( dropdown/Text
+                          "X"
+                          ( fromList2/DropdownOptions/Text
+                              (toDropdownOption/Text "b" (literal/Text "2"))
+                              (toDropdownOption/Text "a" (literal/Text "1"))
+                              ([] : List Ast/DropdownOption/Text)
+                          )
+                      )
+                  )
+              )
+        ===  "?{X|a,1|b,2}"
+
+let exampleFromList2DropdownText3 =
+        assert
+      :     render
+              ( singleton/Commands
+                  ( broadcast/Text
+                      ( dropdown/Text
+                          "X"
+                          ( fromList2/DropdownOptions/Text
+                              (toDropdownOption/Text "c" (literal/Text "3"))
+                              (toDropdownOption/Text "b" (literal/Text "2"))
+                              [ toDropdownOption/Text "a" (literal/Text "1") ]
+                          )
+                      )
+                  )
+              )
+        ===  "?{X|a,1|b,2|c,3}"
+
+let exampleFromList2DropdownText4 =
+        assert
+      :     render
+              ( singleton/Commands
+                  ( broadcast/Text
+                      ( dropdown/Text
+                          "X"
+                          ( fromList2/DropdownOptions/Text
+                              (toDropdownOption/Text "d" (literal/Text "4"))
+                              (toDropdownOption/Text "c" (literal/Text "3"))
+                              [ toDropdownOption/Text "b" (literal/Text "2")
+                              , toDropdownOption/Text "a" (literal/Text "1")
+                              ]
+                          )
+                      )
+                  )
+              )
+        ===  "?{X|a,1|b,2|c,3|d,4}"
+
+let exampleFromListCommand0 =
+      assert : render (fromList/Commands ([] : List Ast/Command)) === ""
+
+let exampleFromListCommand1 =
+        assert
+      :     render (fromList/Commands [ broadcast/Text (literal/Text "a") ])
+        ===  ''
+             a
+             ''
+
+let exampleFromListCommandN =
+        assert
+      :     render
+              ( fromList/Commands
+                  [ broadcast/Text (literal/Text "a")
+                  , broadcast/Text (literal/Text "b")
+                  , broadcast/Text (literal/Text "c")
+                  ]
+              )
+        ===  ''
+             a
+             b
+             c
+             ''
 
 let exampleConcatText0 =
         assert
