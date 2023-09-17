@@ -590,14 +590,9 @@ let render
 
                     let escapedEndBraces = Text/replicate 2 escapedEndBracket
 
-                    let nameEntry =
-                          merge
-                            { None = ""
-                            , Some =
-                                \(name : Text) ->
-                                  "{{name=${name}${escapedEndBraces}"
-                            }
-                            optionalName
+                    let name = merge { None = "", Some = Text/id } optionalName
+
+                    let nameEntry = "{{name=${name}${escapedEndBraces}"
 
                     in  "&{template:default${escapedEndBracket} ${nameEntry}${entries}"
               , Macro =
