@@ -719,3 +719,126 @@ We use `Ast.literal/Text` to convert static pieces of text, and we use `Ast.show
 
 We convert this into a command by saying we want to broadcast it, turn that command into a list of commands, and finally render it to the final macro, give that a test, and then output it.
 Popping that result into roll20 we get a nicely formatted output all on a single line!
+
+### Tables
+
+Combining text together can give some nice results, but when we have this sort of `Damage: [[1d6]];` structure, we should really use the right tool for the job: tables!
+This library especially shines in eliminating a lot of the gotchas around building them.
+
+Let's create a variant of the above example, one that outputs a table instead of text.
+
+```dhall
+-- Import the library
+let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main/src/package.dhall
+
+-- Define a variable that represents rolling a six sided die.
+let d6 : Ast.Random/Natural =
+  -- How we create dice rolls, which always takes two Ast.Naturals
+  Ast.dice/Natural
+    -- Create an Ast/Natural from regular Natural, the number of dice
+    (Ast.literal/Natural 1)
+    -- Create an Ast/Natural from regular Natural, the number of sides
+    (Ast.literal/Natural 6)
+
+-- Define a variable that represents rolling a 20 sided die.
+let d20 : Ast.Random/Natural =
+  -- How we create dice rolls, which always takes two Ast.Naturals
+  Ast.dice/Natural
+    -- Create an Ast/Natural from regular Natural, the number of dice
+    (Ast.literal/Natural 1)
+    -- Create an Ast/Natural from regular Natural, the number of sides
+    (Ast.literal/Natural 20)
+
+-- Define "d20 + 4"
+let d20Plus4 : Ast.Random/Natural =
+  -- Say we're going to add two random things
+  Ast.add/Random/Natural
+    -- The left hand side, our die roll defined above
+    d20
+    -- The right hand side, a literal Natural (4) that we convert to a Random Natural
+    (Ast.toRandom/Natural
+      (Ast.literal/Natural 4)
+    )
+
+-- To create a table, we first need to construct the entries: each labeled valued
+let attackTableEntries : Ast.TableEntries =
+  -- Join together two different table entries as one
+  -- When we have lots of entries to join together, we'll want to use Ast.concat/TableEntries
+  Ast.plusPlus/TableEntries
+    -- Create table entries from just a single labelled value
+    (Ast.singleton/TableEntries
+      -- The label is static text converted into an `Ast.Text`
+      (Ast.literal/Text "Attack")
+      -- The value is our attack roll converted into an `Ast.Text`
+      (Ast.show/Random/Natural d20Plus4)
+    )
+    -- Create our damage entry in a similar way to how we created our attack roll entry
+    (Ast.singleton/TableEntries
+      (Ast.literal/Text "Damage")
+      (Ast.show/Random/Natural d6)
+    )
+
+-- Create a finished table from the entries we created
+let attackTable : Ast.Table =
+  -- This function creates a table from an (optional) name and entries
+  Ast.toTable
+    -- By using Some, we indicate that we do want a name
+    (Some
+      -- Our table name here is a static piece of text converted into an `Ast.Text`
+      (Ast.literal/Text "Attack with Sword")
+    )
+    -- The table entries we defined above
+    attackTableEntries
+
+-- Turn our table into the final broadcasting macro
+let attackTableMacro : Text =
+  Ast.render
+    (Ast.singleton/Commands
+      -- Since we don't have Ast.Text this time, we need to update our broadcast function too
+      (Ast.broadcast/Table attackTable)
+    )
+
+-- For the purposes of this tutorial, a test validates the output
+let test =
+  assert : attackTableMacro ===
+    "&{template:default} {{name=Attack with Sword}} {{Attack=[[(1d20 + 4)]]}} {{Damage=[[1d6]]}}"
+
+-- Use the final macro as the output of this file
+in attackTableMacro
+```
+
+You can see we need quite a bit of code to do this, but that the macro we output is also harder and harder to define by hand--and we're only scratching the surface.
+The bulk of the interest here is in `attackTableEntries` and `attackTable`, but we should briefly note that when we convert this table into a command, we use `Ast.broadcast/Table` rather than `Ast.broadcast/Text`.
+Tables have their own special broadcast command (and whisper) because they cannot safely be converted into text, but they can certainly be broadcast.
+
+Before we dive into the details of this specific table, let's talk at a high level about how we build tables.
+An `Ast.Table` is made of `Ast.TableEntries`.
+This distinction is useful because `Ast.TableEntries` are always unnamed, but an `Ast.Table` has always had its name explicitly chosen (perhaps that there is none).
+So `Ast.toTable` is the final step where we name (or explicitly don't name) `Ast.TableEntries`.
+
+While `Ast.TableEntries` are lists of labeled values, we create a list with a single labeled value via `Ast.singleton/TableEntries`.
+The first argument is the label, and the second argument is the value.
+However, you'll notice that both are of type `Ast.Text`, which means we can do lots of fancy stuff with either of them.
+
+While an `Ast.TableEntry` type could _theoretically_ exist, jumping right into lists makes more sense for building tables.
+This way, we can use the `Ast.plusPlus/TableEntries` operator to continually combine both singletons and lists into larger and larger tables.
+As our tables get larger, we can alternatively use `Ast.concat/TableEntries` to flatten out the code we write.
+Let's see below what `attackTableEntries` would look like if we rewrote it in that style.
+
+```dhall
+let attackTableEntries : Ast.TableEntries =
+  Ast.concat/TableEntries
+    [ Ast.singleton/TableEntries
+        (Ast.literal/Text "Attack")
+        (Ast.show/Random/Natural d20Plus4)
+    , Ast.singleton/TableEntries
+        (Ast.literal/Text "Damage")
+        (Ast.show/Random/Natural d6)
+    ]
+```
+
+For the labels, we need to convert our desired `Text` into an `Ast.Text` with our frequently used `Ast.literal/Text` function.
+For our values, since they are of type `Ast.Random/Natural`, we need to convert them into an `Ast.Text` via `Ast.show/Random/Natural`.
+
+Ultimately, tables are a powerful tool for clean formatting of macros with lots and lots of various types of rolls.
+When we start getting macros of this complexity, using Dhall really starts to shine, as it helps make sure that your macros work correctly, without having to remember all the various rules for getting things to work together nicely.
