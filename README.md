@@ -124,12 +124,11 @@ let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main
 -- Define a variable that represents rolling a six sided die.
 let d6 : Ast.Random/Natural =
   -- How we create dice rolls, which always takes two Ast.Naturals
-  (Ast.dice/Natural
+  Ast.dice/Natural
     -- Create an Ast/Natural from regular Natural, the number of dice
     (Ast.literal/Natural 1)
     -- Create an Ast/Natural from regular Natural, the number of sides
     (Ast.literal/Natural 6)
-  )
 
 -- Define a variable that says how we want to roll our die: we want to broadcast it!
 let diceCommand : Ast.Command =
@@ -193,12 +192,11 @@ let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main
 -- Define a variable that represents rolling a 20 sided die.
 let d20 : Ast.Random/Natural =
   -- How we create dice rolls, which always takes two Ast.Naturals
-  (Ast.dice/Natural
+  Ast.dice/Natural
     -- Create an Ast/Natural from regular Natural, the number of dice
     (Ast.literal/Natural 1)
     -- Create an Ast/Natural from regular Natural, the number of sides
     (Ast.literal/Natural 20)
-  )
 
 -- Define "d20 + 4"
 let d20Plus4 : Ast.Random/Natural =
@@ -269,12 +267,11 @@ let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main
 -- Define a variable that represents rolling a 20 sided die.
 let d20 : Ast.Random/Natural =
   -- How we create dice rolls, which always takes two Ast.Naturals
-  (Ast.dice/Natural
+  Ast.dice/Natural
     -- Create an Ast/Natural from regular Natural, the number of dice
     (Ast.literal/Natural 1)
     -- Create an Ast/Natural from regular Natural, the number of sides
     (Ast.literal/Natural 20)
-  )
 
 -- Define d20 + strength modifier
 let d20PlusStrength : Ast.Random/Natural =
@@ -337,12 +334,11 @@ let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main
 -- Define a variable that represents rolling a 20 sided die.
 let d20 : Ast.Random/Natural =
   -- How we create dice rolls, which always takes two Ast.Naturals
-  (Ast.dice/Natural
+  Ast.dice/Natural
     -- Create an Ast/Natural from regular Natural, the number of dice
     (Ast.literal/Natural 1)
     -- Create an Ast/Natural from regular Natural, the number of sides
     (Ast.literal/Natural 20)
-  )
 
 let functionCheckMacro : Natural -> Text =
   \(modifier : Natural) ->
@@ -412,12 +408,11 @@ let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main
 -- Define a variable that represents rolling a 20 sided die.
 let d20 : Ast.Random/Natural =
   -- How we create dice rolls, which always takes two Ast.Naturals
-  (Ast.dice/Natural
+  Ast.dice/Natural
     -- Create an Ast/Natural from regular Natural, the number of dice
     (Ast.literal/Natural 1)
     -- Create an Ast/Natural from regular Natural, the number of sides
     (Ast.literal/Natural 20)
-  )
 
 -- Define "d20 + 4 + a value from an input"
 let d20Plus4PlusModifier : Ast.Random/Integer =
@@ -525,22 +520,20 @@ let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main
 -- Define a variable that represents rolling a six sided die.
 let d6 : Ast.Random/Natural =
   -- How we create dice rolls, which always takes two Ast.Naturals
-  (Ast.dice/Natural
+  Ast.dice/Natural
     -- Create an Ast/Natural from regular Natural, the number of dice
     (Ast.literal/Natural 1)
     -- Create an Ast/Natural from regular Natural, the number of sides
     (Ast.literal/Natural 6)
-  )
 
 -- Define a variable that represents rolling a 20 sided die.
 let d20 : Ast.Random/Natural =
   -- How we create dice rolls, which always takes two Ast.Naturals
-  (Ast.dice/Natural
+  Ast.dice/Natural
     -- Create an Ast/Natural from regular Natural, the number of dice
     (Ast.literal/Natural 1)
     -- Create an Ast/Natural from regular Natural, the number of sides
     (Ast.literal/Natural 20)
-  )
 
 -- Define "d20 + 4"
 let d20Plus4 : Ast.Random/Natural =
@@ -642,22 +635,20 @@ let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main
 -- Define a variable that represents rolling a six sided die.
 let d6 : Ast.Random/Natural =
   -- How we create dice rolls, which always takes two Ast.Naturals
-  (Ast.dice/Natural
+  Ast.dice/Natural
     -- Create an Ast/Natural from regular Natural, the number of dice
     (Ast.literal/Natural 1)
     -- Create an Ast/Natural from regular Natural, the number of sides
     (Ast.literal/Natural 6)
-  )
 
 -- Define a variable that represents rolling a 20 sided die.
 let d20 : Ast.Random/Natural =
   -- How we create dice rolls, which always takes two Ast.Naturals
-  (Ast.dice/Natural
+  Ast.dice/Natural
     -- Create an Ast/Natural from regular Natural, the number of dice
     (Ast.literal/Natural 1)
     -- Create an Ast/Natural from regular Natural, the number of sides
     (Ast.literal/Natural 20)
-  )
 
 -- Define "d20 + 4"
 let d20Plus4 : Ast.Random/Natural =
