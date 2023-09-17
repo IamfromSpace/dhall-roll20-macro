@@ -30,7 +30,7 @@ let List/monoFold =
           }
           (List/head a xs)
 
-let Character = < Selected | Named : Text | Implicit >
+let Character = < Target | Selected | Named : Text | Implicit >
 
 let Ast/Output =
       { Natural : Type
@@ -511,6 +511,7 @@ let renderCharacter =
       \(x : Character) ->
         merge
           { Implicit = ""
+          , Target = "target|"
           , Selected = "selected|"
           , Named = \(name : Text) -> name ++ "|"
           }
