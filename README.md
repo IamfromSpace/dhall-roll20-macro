@@ -680,7 +680,7 @@ let attackWithDamage : Ast.Text =
       )
     )
 
--- Turn our command into the final broadcasting macro
+-- Turn our text into the final broadcasting macro
 let attackWithDamageMacro : Text =
   Ast.render
     (Ast.singleton/Commands
