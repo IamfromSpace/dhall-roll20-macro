@@ -281,7 +281,7 @@ let d20PlusStrength : Ast.Random/Natural =
     d20
     -- The right hand side, a reference to strength
     (Ast.toRandom/Natural
-      (Ast.attribute/Natural Ast.Target.Implicit "strength_modifier")
+      (Ast.attribute/Natural Ast.Character.Implicit "strength_modifier")
     )
 
 -- Define a variable that says what to do with our check: broadcast it!
@@ -310,7 +310,7 @@ It might seem odd that we need to specify the type of the attribute here--we can
 However, if we know what type to expect, we can construct a macro that is more likely to work with this reference.
 
 We also need to specify the details of our attribute reference.
-Here we say that the character is an `Implicit` target.
+Here we say that the character is the `Implicit` character.
 So we're not specifying exactly who's strength we're using, we let the context decide.
 This is handy for creating reusable macros for abilities as token actions.
 Lastly, we just have to provide the name of the attribute, which in this case is `"strength_modifier"`.

@@ -30,7 +30,7 @@ let List/monoFold =
           }
           (List/head a xs)
 
-let Target = < Selected | Named : Text | Implicit >
+let Character = < Selected | Named : Text | Implicit >
 
 let Ast/Output =
       { Natural : Type
@@ -78,22 +78,22 @@ let Ast/Constructors =
               , Text : Text -> output.Text
               }
           , Ability :
-              { Natural : Target -> Text -> output.Natural
-              , Integer : Target -> Text -> output.Integer
+              { Natural : Character -> Text -> output.Natural
+              , Integer : Character -> Text -> output.Integer
               , Random :
-                  { Natural : Target -> Text -> output.Random output.Natural
-                  , Integer : Target -> Text -> output.Random output.Integer
+                  { Natural : Character -> Text -> output.Random output.Natural
+                  , Integer : Character -> Text -> output.Random output.Integer
                   }
-              , Text : Target -> Text -> output.Text
+              , Text : Character -> Text -> output.Text
               }
           , Attribute :
-              { Natural : Target -> Text -> output.Natural
-              , Integer : Target -> Text -> output.Integer
+              { Natural : Character -> Text -> output.Natural
+              , Integer : Character -> Text -> output.Integer
               , Random :
-                  { Natural : Target -> Text -> output.Random output.Natural
-                  , Integer : Target -> Text -> output.Random output.Integer
+                  { Natural : Character -> Text -> output.Random output.Natural
+                  , Integer : Character -> Text -> output.Random output.Integer
                   }
-              , Text : Target -> Text -> output.Text
+              , Text : Character -> Text -> output.Text
               }
           , Input :
               { Natural : Text -> Optional output.Natural -> output.Natural
@@ -507,8 +507,8 @@ let Ast/DropdownOptions/Command
       forall (cs : Ast/Constructors output) ->
         output.DropdownOptions output.Command
 
-let renderTarget =
-      \(x : Target) ->
+let renderCharacter =
+      \(x : Character) ->
         merge
           { Implicit = ""
           , Selected = "selected|"
@@ -620,17 +620,17 @@ let render
                       }
               , Ability =
                   let f =
-                        \(char : Target) ->
+                        \(char : Character) ->
                         \(name : Text) ->
-                          "%{${renderTarget char}${name}}"
+                          "%{${renderCharacter char}${name}}"
 
                   let fNum =
-                        \(char : Target) ->
+                        \(char : Character) ->
                         \(name : Text) ->
                           inParens (f char name)
 
                   let fRand =
-                        \(char : Target) ->
+                        \(char : Character) ->
                         \(name : Text) ->
                           inDoubleBrackets (f char name)
 
@@ -641,17 +641,17 @@ let render
                       }
               , Attribute =
                   let f =
-                        \(char : Target) ->
+                        \(char : Character) ->
                         \(name : Text) ->
-                          "@{${renderTarget char}${name}}"
+                          "@{${renderCharacter char}${name}}"
 
                   let fNum =
-                        \(char : Target) ->
+                        \(char : Character) ->
                         \(name : Text) ->
                           inParens (f char name)
 
                   let fRand =
-                        \(char : Target) ->
+                        \(char : Character) ->
                         \(name : Text) ->
                           inDoubleBrackets (f char name)
 
@@ -907,80 +907,80 @@ let macro/Random/Natural
         (cs 0).Macro.Random.Natural x
 
 let ability/Integer
-    : Target -> Text -> Ast/Integer
-    = \(char : Target) ->
+    : Character -> Text -> Ast/Integer
+    = \(char : Character) ->
       \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Ability.Integer char name
 
 let ability/Natural
-    : Target -> Text -> Ast/Natural
-    = \(char : Target) ->
+    : Character -> Text -> Ast/Natural
+    = \(char : Character) ->
       \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Ability.Natural char name
 
 let ability/Text
-    : Target -> Text -> Ast/Text
-    = \(char : Target) ->
+    : Character -> Text -> Ast/Text
+    = \(char : Character) ->
       \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Ability.Text char name
 
 let ability/Random/Integer
-    : Target -> Text -> Ast/Random/Integer
-    = \(char : Target) ->
+    : Character -> Text -> Ast/Random/Integer
+    = \(char : Character) ->
       \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Ability.Random.Integer char name
 
 let ability/Random/Natural
-    : Target -> Text -> Ast/Random/Natural
-    = \(char : Target) ->
+    : Character -> Text -> Ast/Random/Natural
+    = \(char : Character) ->
       \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Ability.Random.Natural char name
 
 let attribute/Integer
-    : Target -> Text -> Ast/Integer
-    = \(char : Target) ->
+    : Character -> Text -> Ast/Integer
+    = \(char : Character) ->
       \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Attribute.Integer char name
 
 let attribute/Natural
-    : Target -> Text -> Ast/Natural
-    = \(char : Target) ->
+    : Character -> Text -> Ast/Natural
+    = \(char : Character) ->
       \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Attribute.Natural char name
 
 let attribute/Random/Integer
-    : Target -> Text -> Ast/Random/Integer
-    = \(char : Target) ->
+    : Character -> Text -> Ast/Random/Integer
+    = \(char : Character) ->
       \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Attribute.Random.Integer char name
 
 let attribute/Random/Natural
-    : Target -> Text -> Ast/Random/Natural
-    = \(char : Target) ->
+    : Character -> Text -> Ast/Random/Natural
+    = \(char : Character) ->
       \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
         (cs 0).Attribute.Random.Natural char name
 
 let attribute/Text
-    : Target -> Text -> Ast/Text
-    = \(char : Target) ->
+    : Character -> Text -> Ast/Text
+    = \(char : Character) ->
       \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
@@ -2013,7 +2013,7 @@ let exampleAstUseTextualAttribute =
                       ( plusPlus/Text
                           ( plusPlus/Text
                               (literal/Text "I called ")
-                              (attribute/Text Target.Implicit "attribute")
+                              (attribute/Text Character.Implicit "attribute")
                           )
                           (literal/Text " just now")
                       )
@@ -2029,9 +2029,9 @@ let exampleAstSelectDiceSidesFromMathOnAttributesAndAbilities =
                       ( dice/Natural
                           (literal/Natural 4)
                           ( add/Natural
-                              (attribute/Natural Target.Selected "some_att")
+                              (attribute/Natural Character.Selected "some_att")
                               ( multiply/Natural
-                                  (ability/Natural Target.Implicit "some_ab")
+                                  (ability/Natural Character.Implicit "some_ab")
                                   (literal/Natural 5)
                               )
                           )
