@@ -78,30 +78,22 @@ let Ast/Constructors =
               , Text : Text -> output.Text
               }
           , Ability :
-              { Natural : { char : Target, name : Text } -> output.Natural
-              , Integer : { char : Target, name : Text } -> output.Integer
+              { Natural : Target -> Text -> output.Natural
+              , Integer : Target -> Text -> output.Integer
               , Random :
-                  { Natural :
-                      { char : Target, name : Text } ->
-                        output.Random output.Natural
-                  , Integer :
-                      { char : Target, name : Text } ->
-                        output.Random output.Integer
+                  { Natural : Target -> Text -> output.Random output.Natural
+                  , Integer : Target -> Text -> output.Random output.Integer
                   }
-              , Text : { char : Target, name : Text } -> output.Text
+              , Text : Target -> Text -> output.Text
               }
           , Attribute :
-              { Natural : { char : Target, name : Text } -> output.Natural
-              , Integer : { char : Target, name : Text } -> output.Integer
+              { Natural : Target -> Text -> output.Natural
+              , Integer : Target -> Text -> output.Integer
               , Random :
-                  { Natural :
-                      { char : Target, name : Text } ->
-                        output.Random output.Natural
-                  , Integer :
-                      { char : Target, name : Text } ->
-                        output.Random output.Integer
+                  { Natural : Target -> Text -> output.Random output.Natural
+                  , Integer : Target -> Text -> output.Random output.Integer
                   }
-              , Text : { char : Target, name : Text } -> output.Text
+              , Text : Target -> Text -> output.Text
               }
           , Input :
               { Natural : Text -> Optional output.Natural -> output.Natural
@@ -628,15 +620,19 @@ let render
                       }
               , Ability =
                   let f =
-                        \(x : { char : Target, name : Text }) ->
-                          "%{${renderTarget x.char}${x.name}}"
+                        \(char : Target) ->
+                        \(name : Text) ->
+                          "%{${renderTarget char}${name}}"
 
                   let fNum =
-                        \(x : { char : Target, name : Text }) -> inParens (f x)
+                        \(char : Target) ->
+                        \(name : Text) ->
+                          inParens (f char name)
 
                   let fRand =
-                        \(x : { char : Target, name : Text }) ->
-                          inDoubleBrackets (f x)
+                        \(char : Target) ->
+                        \(name : Text) ->
+                          inDoubleBrackets (f char name)
 
                   in  { Natural = fNum
                       , Integer = fNum
@@ -645,15 +641,19 @@ let render
                       }
               , Attribute =
                   let f =
-                        \(x : { char : Target, name : Text }) ->
-                          "@{${renderTarget x.char}${x.name}}"
+                        \(char : Target) ->
+                        \(name : Text) ->
+                          "@{${renderTarget char}${name}}"
 
                   let fNum =
-                        \(x : { char : Target, name : Text }) -> inParens (f x)
+                        \(char : Target) ->
+                        \(name : Text) ->
+                          inParens (f char name)
 
                   let fRand =
-                        \(x : { char : Target, name : Text }) ->
-                          inDoubleBrackets (f x)
+                        \(char : Target) ->
+                        \(name : Text) ->
+                          inDoubleBrackets (f char name)
 
                   in  { Natural = fNum
                       , Integer = fNum
@@ -907,74 +907,84 @@ let macro/Random/Natural
         (cs 0).Macro.Random.Natural x
 
 let ability/Integer
-    : { char : Target, name : Text } -> Ast/Integer
-    = \(x : { char : Target, name : Text }) ->
+    : Target -> Text -> Ast/Integer
+    = \(char : Target) ->
+      \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Ability.Integer x
+        (cs 0).Ability.Integer char name
 
 let ability/Natural
-    : { char : Target, name : Text } -> Ast/Natural
-    = \(x : { char : Target, name : Text }) ->
+    : Target -> Text -> Ast/Natural
+    = \(char : Target) ->
+      \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Ability.Natural x
+        (cs 0).Ability.Natural char name
 
 let ability/Text
-    : { char : Target, name : Text } -> Ast/Text
-    = \(x : { char : Target, name : Text }) ->
+    : Target -> Text -> Ast/Text
+    = \(char : Target) ->
+      \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Ability.Text x
+        (cs 0).Ability.Text char name
 
 let ability/Random/Integer
-    : { char : Target, name : Text } -> Ast/Random/Integer
-    = \(x : { char : Target, name : Text }) ->
+    : Target -> Text -> Ast/Random/Integer
+    = \(char : Target) ->
+      \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Ability.Random.Integer x
+        (cs 0).Ability.Random.Integer char name
 
 let ability/Random/Natural
-    : { char : Target, name : Text } -> Ast/Random/Natural
-    = \(x : { char : Target, name : Text }) ->
+    : Target -> Text -> Ast/Random/Natural
+    = \(char : Target) ->
+      \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Ability.Random.Natural x
+        (cs 0).Ability.Random.Natural char name
 
 let attribute/Integer
-    : { char : Target, name : Text } -> Ast/Integer
-    = \(x : { char : Target, name : Text }) ->
+    : Target -> Text -> Ast/Integer
+    = \(char : Target) ->
+      \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Attribute.Integer x
+        (cs 0).Attribute.Integer char name
 
 let attribute/Natural
-    : { char : Target, name : Text } -> Ast/Natural
-    = \(x : { char : Target, name : Text }) ->
+    : Target -> Text -> Ast/Natural
+    = \(char : Target) ->
+      \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Attribute.Natural x
+        (cs 0).Attribute.Natural char name
 
 let attribute/Random/Integer
-    : { char : Target, name : Text } -> Ast/Random/Integer
-    = \(x : { char : Target, name : Text }) ->
+    : Target -> Text -> Ast/Random/Integer
+    = \(char : Target) ->
+      \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Attribute.Random.Integer x
+        (cs 0).Attribute.Random.Integer char name
 
 let attribute/Random/Natural
-    : { char : Target, name : Text } -> Ast/Random/Natural
-    = \(x : { char : Target, name : Text }) ->
+    : Target -> Text -> Ast/Random/Natural
+    = \(char : Target) ->
+      \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Attribute.Random.Natural x
+        (cs 0).Attribute.Random.Natural char name
 
 let attribute/Text
-    : { char : Target, name : Text } -> Ast/Text
-    = \(x : { char : Target, name : Text }) ->
+    : Target -> Text -> Ast/Text
+    = \(char : Target) ->
+      \(name : Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Attribute.Text x
+        (cs 0).Attribute.Text char name
 
 let input/Natural
     : Text -> Optional Ast/Natural -> Ast/Natural
@@ -2003,9 +2013,7 @@ let exampleAstUseTextualAttribute =
                       ( plusPlus/Text
                           ( plusPlus/Text
                               (literal/Text "I called ")
-                              ( attribute/Text
-                                  { char = Target.Implicit, name = "attribute" }
-                              )
+                              (attribute/Text Target.Implicit "attribute")
                           )
                           (literal/Text " just now")
                       )
@@ -2021,15 +2029,9 @@ let exampleAstSelectDiceSidesFromMathOnAttributesAndAbilities =
                       ( dice/Natural
                           (literal/Natural 4)
                           ( add/Natural
-                              ( attribute/Natural
-                                  { char = Target.Selected, name = "some_att" }
-                              )
+                              (attribute/Natural Target.Selected "some_att")
                               ( multiply/Natural
-                                  ( ability/Natural
-                                      { char = Target.Implicit
-                                      , name = "some_ab"
-                                      }
-                                  )
+                                  (ability/Natural Target.Implicit "some_ab")
                                   (literal/Natural 5)
                               )
                           )

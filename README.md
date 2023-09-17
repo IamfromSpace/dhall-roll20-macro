@@ -281,7 +281,7 @@ let d20PlusStrength : Ast.Random/Natural =
     d20
     -- The right hand side, a reference to strength
     (Ast.toRandom/Natural
-      (Ast.attribute/Natural { char = Ast.Target.Implicit, name = "strength_modifier" })
+      (Ast.attribute/Natural Ast.Target.Implicit "strength_modifier")
     )
 
 -- Define a variable that says what to do with our check: broadcast it!
