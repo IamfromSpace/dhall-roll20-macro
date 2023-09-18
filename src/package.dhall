@@ -1477,20 +1477,15 @@ let fromList2 =
       \(ts : Type) ->
       \(f : t -> ts -> ts) ->
       \(pair : t -> t -> ts) ->
-      \(last : t) ->
-      \(secondToLast : t) ->
       \(list : List t) ->
-        List/foldLeft
-          t
-          list
-          ts
-          (\(xs : ts) -> \(x : t) -> f x xs)
-          (pair secondToLast last)
+      \(secondToLast : t) ->
+      \(last : t) ->
+        List/fold t list ts f (pair secondToLast last)
 
 let fromList2/DropdownOptions/Natural
-    : Ast/DropdownOption/Natural ->
+    : List Ast/DropdownOption/Natural ->
       Ast/DropdownOption/Natural ->
-      List Ast/DropdownOption/Natural ->
+      Ast/DropdownOption/Natural ->
         Ast/DropdownOptions/Natural
     = fromList2
         Ast/DropdownOption/Natural
@@ -1499,9 +1494,9 @@ let fromList2/DropdownOptions/Natural
         pair/DropdownOptions/Natural
 
 let fromList2/DropdownOptions/Integer
-    : Ast/DropdownOption/Integer ->
+    : List Ast/DropdownOption/Integer ->
       Ast/DropdownOption/Integer ->
-      List Ast/DropdownOption/Integer ->
+      Ast/DropdownOption/Integer ->
         Ast/DropdownOptions/Integer
     = fromList2
         Ast/DropdownOption/Integer
@@ -1510,9 +1505,9 @@ let fromList2/DropdownOptions/Integer
         pair/DropdownOptions/Integer
 
 let fromList2/DropdownOptions/Random/Natural
-    : Ast/DropdownOption/Random/Natural ->
+    : List Ast/DropdownOption/Random/Natural ->
       Ast/DropdownOption/Random/Natural ->
-      List Ast/DropdownOption/Random/Natural ->
+      Ast/DropdownOption/Random/Natural ->
         Ast/DropdownOptions/Random/Natural
     = fromList2
         Ast/DropdownOption/Random/Natural
@@ -1521,9 +1516,9 @@ let fromList2/DropdownOptions/Random/Natural
         pair/DropdownOptions/Random/Natural
 
 let fromList2/DropdownOptions/Random/Integer
-    : Ast/DropdownOption/Random/Integer ->
+    : List Ast/DropdownOption/Random/Integer ->
       Ast/DropdownOption/Random/Integer ->
-      List Ast/DropdownOption/Random/Integer ->
+      Ast/DropdownOption/Random/Integer ->
         Ast/DropdownOptions/Random/Integer
     = fromList2
         Ast/DropdownOption/Random/Integer
@@ -1532,9 +1527,9 @@ let fromList2/DropdownOptions/Random/Integer
         pair/DropdownOptions/Random/Integer
 
 let fromList2/DropdownOptions/Text
-    : Ast/DropdownOption/Text ->
+    : List Ast/DropdownOption/Text ->
       Ast/DropdownOption/Text ->
-      List Ast/DropdownOption/Text ->
+      Ast/DropdownOption/Text ->
         Ast/DropdownOptions/Text
     = fromList2
         Ast/DropdownOption/Text
@@ -1543,9 +1538,9 @@ let fromList2/DropdownOptions/Text
         pair/DropdownOptions/Text
 
 let fromList2/DropdownOptions/TableEntries
-    : Ast/DropdownOption/TableEntries ->
+    : List Ast/DropdownOption/TableEntries ->
       Ast/DropdownOption/TableEntries ->
-      List Ast/DropdownOption/TableEntries ->
+      Ast/DropdownOption/TableEntries ->
         Ast/DropdownOptions/TableEntries
     = fromList2
         Ast/DropdownOption/TableEntries
@@ -1554,9 +1549,9 @@ let fromList2/DropdownOptions/TableEntries
         pair/DropdownOptions/TableEntries
 
 let fromList2/DropdownOptions/Table
-    : Ast/DropdownOption/Table ->
+    : List Ast/DropdownOption/Table ->
       Ast/DropdownOption/Table ->
-      List Ast/DropdownOption/Table ->
+      Ast/DropdownOption/Table ->
         Ast/DropdownOptions/Table
     = fromList2
         Ast/DropdownOption/Table
@@ -1565,9 +1560,9 @@ let fromList2/DropdownOptions/Table
         pair/DropdownOptions/Table
 
 let fromList2/DropdownOptions/Command
-    : Ast/DropdownOption/Command ->
+    : List Ast/DropdownOption/Command ->
       Ast/DropdownOption/Command ->
-      List Ast/DropdownOption/Command ->
+      Ast/DropdownOption/Command ->
         Ast/DropdownOptions/Command
     = fromList2
         Ast/DropdownOption/Command
@@ -1877,9 +1872,9 @@ let exampleFromList2DropdownText2 =
                       ( dropdown/Text
                           "X"
                           ( fromList2/DropdownOptions/Text
-                              (dropdownOption/Text "b" (literal/Text "2"))
-                              (dropdownOption/Text "a" (literal/Text "1"))
                               ([] : List Ast/DropdownOption/Text)
+                              (dropdownOption/Text "a" (literal/Text "1"))
+                              (dropdownOption/Text "b" (literal/Text "2"))
                           )
                       )
                   )
@@ -1894,9 +1889,9 @@ let exampleFromList2DropdownText3 =
                       ( dropdown/Text
                           "X"
                           ( fromList2/DropdownOptions/Text
-                              (dropdownOption/Text "c" (literal/Text "3"))
-                              (dropdownOption/Text "b" (literal/Text "2"))
                               [ dropdownOption/Text "a" (literal/Text "1") ]
+                              (dropdownOption/Text "b" (literal/Text "2"))
+                              (dropdownOption/Text "c" (literal/Text "3"))
                           )
                       )
                   )
@@ -1911,11 +1906,11 @@ let exampleFromList2DropdownText4 =
                       ( dropdown/Text
                           "X"
                           ( fromList2/DropdownOptions/Text
-                              (dropdownOption/Text "d" (literal/Text "4"))
-                              (dropdownOption/Text "c" (literal/Text "3"))
-                              [ dropdownOption/Text "b" (literal/Text "2")
-                              , dropdownOption/Text "a" (literal/Text "1")
+                              [ dropdownOption/Text "a" (literal/Text "1")
+                              , dropdownOption/Text "b" (literal/Text "2")
                               ]
+                              (dropdownOption/Text "c" (literal/Text "3"))
+                              (dropdownOption/Text "d" (literal/Text "4"))
                           )
                       )
                   )
