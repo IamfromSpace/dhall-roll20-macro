@@ -1,20 +1,26 @@
 let Integer/abs =
       https://raw.githubusercontent.com/dhall-lang/dhall-lang/v21.1.0/Prelude/Integer/abs.dhall
+        sha256:35212fcbe1e60cb95b033a4a9c6e45befca4a298aa9919915999d09e69ddced1
 
 let Integer/greaterThan =
       https://raw.githubusercontent.com/dhall-lang/dhall-lang/v21.1.0/Prelude/Integer/greaterThan.dhall
+        sha256:d23affd73029fc9aaf867c2c7b86510ca2802d3f0d1f3e1d1a93ffd87b7cb64b
 
 let Optional/map =
       https://raw.githubusercontent.com/dhall-lang/dhall-lang/v21.1.0/Prelude/Optional/map.dhall
+        sha256:501534192d988218d43261c299cc1d1e0b13d25df388937add784778ab0054fa
 
 let Text/replicate =
       https://raw.githubusercontent.com/dhall-lang/dhall-lang/v21.1.0/Prelude/Text/replicate.dhall
+        sha256:1b398b1d464b3a6c7264a690ac3cacb443b5683b43348c859d68e7c2cb925c4f
 
 let List/drop =
       https://raw.githubusercontent.com/dhall-lang/dhall-lang/v21.1.0/Prelude/List/drop.dhall
+        sha256:af983ba3ead494dd72beed05c0f3a17c36a4244adedf7ced502c6512196ed0cf
 
 let List/foldLeft =
       https://raw.githubusercontent.com/dhall-lang/dhall-lang/v21.1.0/Prelude/List/foldLeft.dhall
+        sha256:3c6ab57950fe644906b7bbdef0b9523440b6ee17773ebb8cbd41ffacb8bfab61
 
 let Text/id = \(x : Text) -> x
 
