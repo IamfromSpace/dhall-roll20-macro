@@ -20,9 +20,9 @@ let Text/id = \(x : Text) -> x
 
 let List/monoFold =
       \(a : Type) ->
-      \(xs : List a) ->
       \(mappend : a -> a -> a) ->
       \(mempty : a) ->
+      \(xs : List a) ->
         merge
           { None = mempty
           , Some =
@@ -1609,22 +1609,15 @@ let plusPlus/Commands
 
 let concat/Text
     : List Ast/Text -> Ast/Text
-    = \(list : List Ast/Text) ->
-        List/monoFold Ast/Text list plusPlus/Text (literal/Text "")
+    = List/monoFold Ast/Text plusPlus/Text (literal/Text "")
 
 let concat/TableEntries
     : List Ast/TableEntries -> Ast/TableEntries
-    = \(list : List Ast/TableEntries) ->
-        List/monoFold
-          Ast/TableEntries
-          list
-          plusPlus/TableEntries
-          empty/TableEntries
+    = List/monoFold Ast/TableEntries plusPlus/TableEntries empty/TableEntries
 
 let concat/Commands
     : List Ast/Commands -> Ast/Commands
-    = \(list : List Ast/Commands) ->
-        List/monoFold Ast/Commands list plusPlus/Commands empty/Commands
+    = List/monoFold Ast/Commands plusPlus/Commands empty/Commands
 
 let add/Integer
     : Ast/Integer -> Ast/Integer -> Ast/Integer
@@ -1660,31 +1653,25 @@ let add/Random/Integer
 
 let sum/Integer
     : List Ast/Integer -> Ast/Integer
-    = \(list : List Ast/Integer) ->
-        List/monoFold Ast/Integer list add/Integer (literal/Integer +0)
+    = List/monoFold Ast/Integer add/Integer (literal/Integer +0)
 
 let sum/Natural
     : List Ast/Natural -> Ast/Natural
-    = \(list : List Ast/Natural) ->
-        List/monoFold Ast/Natural list add/Natural (literal/Natural 0)
+    = List/monoFold Ast/Natural add/Natural (literal/Natural 0)
 
 let sum/Random/Integer
     : List Ast/Random/Integer -> Ast/Random/Integer
-    = \(list : List Ast/Random/Integer) ->
-        List/monoFold
-          Ast/Random/Integer
-          list
-          add/Random/Integer
-          (toRandom/Integer (literal/Integer +0))
+    = List/monoFold
+        Ast/Random/Integer
+        add/Random/Integer
+        (toRandom/Integer (literal/Integer +0))
 
 let sum/Random/Natural
     : List Ast/Random/Natural -> Ast/Random/Natural
-    = \(list : List Ast/Random/Natural) ->
-        List/monoFold
-          Ast/Random/Natural
-          list
-          add/Random/Natural
-          (toRandom/Natural (literal/Natural 0))
+    = List/monoFold
+        Ast/Random/Natural
+        add/Random/Natural
+        (toRandom/Natural (literal/Natural 0))
 
 let multiply/Integer
     : Ast/Integer -> Ast/Integer -> Ast/Integer
@@ -1720,31 +1707,25 @@ let multiply/Random/Natural
 
 let product/Integer
     : List Ast/Integer -> Ast/Integer
-    = \(list : List Ast/Integer) ->
-        List/monoFold Ast/Integer list multiply/Integer (literal/Integer +1)
+    = List/monoFold Ast/Integer multiply/Integer (literal/Integer +1)
 
 let product/Natural
     : List Ast/Natural -> Ast/Natural
-    = \(list : List Ast/Natural) ->
-        List/monoFold Ast/Natural list multiply/Natural (literal/Natural 1)
+    = List/monoFold Ast/Natural multiply/Natural (literal/Natural 1)
 
 let product/Random/Integer
     : List Ast/Random/Integer -> Ast/Random/Integer
-    = \(list : List Ast/Random/Integer) ->
-        List/monoFold
-          Ast/Random/Integer
-          list
-          multiply/Random/Integer
-          (toRandom/Integer (literal/Integer +1))
+    = List/monoFold
+        Ast/Random/Integer
+        multiply/Random/Integer
+        (toRandom/Integer (literal/Integer +1))
 
 let product/Random/Natural
     : List Ast/Random/Natural -> Ast/Random/Natural
-    = \(list : List Ast/Random/Natural) ->
-        List/monoFold
-          Ast/Random/Natural
-          list
-          multiply/Random/Natural
-          (toRandom/Natural (literal/Natural 1))
+    = List/monoFold
+        Ast/Random/Natural
+        multiply/Random/Natural
+        (toRandom/Natural (literal/Natural 1))
 
 let show/Integer
     : Ast/Integer -> Ast/Text
