@@ -116,7 +116,7 @@ let Ast/Constructors =
                         output.DropdownOptions output.Command
                   }
               }
-          , ToTable :
+          , Table :
               Optional output.Text -> output.TableEntries -> output.Table
           , Macro :
               { Natural : Text -> output.Natural
@@ -624,7 +624,7 @@ let render
                       , Table = f
                       , Command = f
                       }
-              , ToTable =
+              , Table =
                   \(optionalName : Optional Text) ->
                   \(entries : Text) ->
                     let escapedEndBracket = renderQueryClosingBracket queryDepth
@@ -952,13 +952,13 @@ let pair/DropdownOptions/Command
       \(cs : Ast/Constructors output) ->
         (cs 0).Pair.DropdownOptions.Command (a output cs) (b output cs)
 
-let toTable
+let table
     : Optional Ast/Text -> Ast/TableEntries -> Ast/Table
     = \(optionalName : Optional Ast/Text) ->
       \(entries : Ast/TableEntries) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).ToTable
+        (cs 0).Table
           ( Optional/map
               Ast/Text
               output.Text

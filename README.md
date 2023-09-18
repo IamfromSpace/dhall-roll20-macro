@@ -781,7 +781,7 @@ let attackTableEntries : Ast.TableEntries =
 -- Create a finished table from the entries we created
 let attackTable : Ast.Table =
   -- This function creates a table from an (optional) name and entries
-  Ast.toTable
+  Ast.table
     -- By using Some, we indicate that we do want a name
     (Some
       -- Our table name here is a static piece of text converted into an `Ast.Text`
@@ -814,7 +814,7 @@ Tables have their own special broadcast command (and whisper) because they canno
 Before we dive into the details of this specific table, let's talk at a high level about how we build tables.
 An `Ast.Table` is made of `Ast.TableEntries`.
 This distinction is useful because `Ast.TableEntries` are always unnamed, but an `Ast.Table` has always had its name explicitly chosen (perhaps that there is none).
-So `Ast.toTable` is the final step where we name (or explicitly don't name) `Ast.TableEntries`.
+So `Ast.table` is the final step where we name (or explicitly don't name) `Ast.TableEntries`.
 
 While `Ast.TableEntries` are lists of labeled values, we create a list with a single labeled value via `Ast.singleton/TableEntries`.
 The first argument is the label, and the second argument is the value.
