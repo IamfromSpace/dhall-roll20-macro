@@ -2155,4 +2155,149 @@ let exampleAstDropdownOptionList =
               )
         ===  "[[?{Dropdown|A,1|B,2|C,3}]]"
 
-in {=}
+in  { Character
+    , Natural = Ast/Natural
+    , Integer = Ast/Integer
+    , Random/Natural = Ast/Random/Natural
+    , Random/Integer = Ast/Random/Integer
+    , Text = Ast/Text
+    , TableEntries = Ast/TableEntries
+    , Table = Ast/Table
+    , Command = Ast/Command
+    , Commands = Ast/Commands
+    , DropdownOption/Natural = Ast/DropdownOption/Natural
+    , DropdownOption/Integer = Ast/DropdownOption/Integer
+    , DropdownOption/Random/Natural = Ast/DropdownOption/Random/Natural
+    , DropdownOption/Random/Integer = Ast/DropdownOption/Random/Integer
+    , DropdownOption/Text = Ast/DropdownOption/Text
+    , DropdownOption/TableEntries = Ast/DropdownOption/TableEntries
+    , DropdownOption/Table = Ast/DropdownOption/Table
+    , DropdownOption/Command = Ast/DropdownOption/Command
+    , DropdownOptions/Natural = Ast/DropdownOptions/Natural
+    , DropdownOptions/Integer = Ast/DropdownOptions/Integer
+    , DropdownOptions/Random/Natural = Ast/DropdownOptions/Random/Natural
+    , DropdownOptions/Random/Integer = Ast/DropdownOptions/Random/Integer
+    , DropdownOptions/Text = Ast/DropdownOptions/Text
+    , DropdownOptions/TableEntries = Ast/DropdownOptions/TableEntries
+    , DropdownOptions/Table = Ast/DropdownOptions/Table
+    , DropdownOptions/Command = Ast/DropdownOptions/Command
+    , render
+    , literal/Integer
+    , literal/Natural
+    , literal/Text
+    , empty/TableEntries
+    , empty/Commands
+    , singleton/TableEntries
+    , singleton/Commands
+    , pair/DropdownOptions/Natural
+    , pair/DropdownOptions/Integer
+    , pair/DropdownOptions/Random/Natural
+    , pair/DropdownOptions/Random/Integer
+    , pair/DropdownOptions/Text
+    , pair/DropdownOptions/TableEntries
+    , pair/DropdownOptions/Table
+    , pair/DropdownOptions/Command
+    , table
+    , macro/Integer
+    , macro/Natural
+    , macro/Text
+    , macro/Random/Integer
+    , macro/Random/Natural
+    , ability/Integer
+    , ability/Natural
+    , ability/Text
+    , ability/Random/Integer
+    , ability/Random/Natural
+    , attribute/Integer
+    , attribute/Natural
+    , attribute/Random/Integer
+    , attribute/Random/Natural
+    , attribute/Text
+    , input/Natural
+    , input/Integer
+    , input/Text
+    , input/Command
+    , input/Random/Natural
+    , input/Random/Integer
+    , dropdownOption/Natural
+    , dropdownOption/Integer
+    , dropdownOption/Random/Natural
+    , dropdownOption/Random/Integer
+    , dropdownOption/Text
+    , dropdownOption/TableEntries
+    , dropdownOption/Table
+    , dropdownOption/Command
+    , dropdown/Natural
+    , dropdown/Integer
+    , dropdown/Random/Natural
+    , dropdown/Random/Integer
+    , dropdown/Text
+    , dropdown/TableEntries
+    , dropdown/Table
+    , dropdown/Command
+    , toInteger/Natural
+    , toInteger/Random/Natural
+    , absoluteValue/Integer
+    , absoluteValue/Random/Integer
+    , dice/Natural
+    , dice/Random
+    , toRandom/Natural
+    , toRandom/Integer
+    , label/Integer
+    , label/Natural
+    , cons/DropdownOptions/Natural
+    , cons/DropdownOptions/Integer
+    , cons/DropdownOptions/Random/Natural
+    , cons/DropdownOptions/Random/Integer
+    , cons/DropdownOptions/Text
+    , cons/DropdownOptions/TableEntries
+    , cons/DropdownOptions/Table
+    , cons/DropdownOptions/Command
+    , cons/Commands
+    , fromList2/DropdownOptions/Natural
+    , fromList2/DropdownOptions/Integer
+    , fromList2/DropdownOptions/Random/Natural
+    , fromList2/DropdownOptions/Random/Integer
+    , fromList2/DropdownOptions/Text
+    , fromList2/DropdownOptions/TableEntries
+    , fromList2/DropdownOptions/Table
+    , fromList2/DropdownOptions/Command
+    , fromList/Commands
+    , plusPlus/Text
+    , plusPlus/TableEntries
+    , plusPlus/Table
+    , plusPlus/Commands
+    , concat/Text
+    , concat/TableEntries
+    , concat/Commands
+    , add/Integer
+    , add/Natural
+    , add/Random/Natural
+    , add/Random/Integer
+    , sum/Integer
+    , sum/Natural
+    , sum/Random/Integer
+    , sum/Random/Natural
+    , multiply/Integer
+    , multiply/Natural
+    , multiply/Random/Integer
+    , multiply/Random/Natural
+    , product/Integer
+    , product/Natural
+    , product/Random/Integer
+    , product/Random/Natural
+    , show/Integer
+    , show/Natural
+    , show/Random/Natural
+    , show/Random/Integer
+    , broadcast/Text
+    , broadcast/Table
+    , broadcastAs/Text
+    , broadcastAs/Table
+    , emote
+    , emoteAs
+    , whisper/Text
+    , whisper/Table
+    , roll/Natural
+    , roll/Integer
+    }
