@@ -842,3 +842,140 @@ For our values, since they are of type `Ast.Random/Natural`, we need to convert 
 
 Ultimately, tables are a powerful tool for clean formatting of macros with lots and lots of various types of rolls.
 When we start getting macros of this complexity, using Dhall really starts to shine, as it helps make sure that your macros work correctly, without having to remember all the various rules for getting things to work together nicely.
+
+### Dropdown Inputs
+
+While using Dhall for macros starts to shine when creating tables, creating dropdowns is where it's a game changer.
+Dropdowns can be quite a handy tool, but with advanced usage you need escape characters all over the place.
+Worse still, you have to escape your escapes for each level of nesting.
+This library lets you use dropdowns to their fullest potential, without wrangling all this nonsense by hand--all escaping is automatically done for you.
+
+The one challenge we face when using dropdowns is that they have a pretty annoying invariant: they need at least two entries.
+This makes some sense, but it makes constructing them a bit clunky at times.
+We've consistently used a variety of the `singleton` function to turn a single item into a list of items.
+And while we rarely need it, the `empty` variety allows us to make a list without any items at all.
+We can't use either of those for `Ast.DropdownOptions` because that wouldn't be enough items to create a valid dropdown.
+Instead, we introduce a handful of `pair` functions, which makes a list from two items.
+
+Let's take a look at building out a dropdown for the classic Fort/Dex/Will saves.
+We'll have a +4 Fortitude save, a +3 Dexterity save, and a +5 Will save.
+We want the user to have a single macro for all three saves, which presents a dropdown so the user can select the relevant save for the situation.
+Based on their selection, we want to substitute in the correct bonus, added to a d20.
+Let's look at the finished macro and then break it down.
+
+```dhall
+-- Import the library
+let Ast = https://raw.githubusercontent.com/IamfromSpace/dhall-roll20-macro/main/src/package.dhall
+
+-- Define a variable that represents rolling a 20 sided die.
+let d20 : Ast.Random/Natural =
+  -- How we create dice rolls, which always takes two Ast.Naturals
+  Ast.dice/Natural
+    -- Create an Ast/Natural from regular Natural, the number of dice
+    (Ast.literal/Natural 1)
+    -- Create an Ast/Natural from regular Natural, the number of sides
+    (Ast.literal/Natural 20)
+
+-- We define our options as a variable.
+-- Notice how we use the Natural type throughout, as the user is selecting a positive number; all options must match in type
+let savesDropdownOptions : Ast.DropdownOptions/Natural =
+  -- We use the cons operator to stack single items into a list
+  -- Later we'll show how to use the alternative fromList2 function
+  Ast.cons/DropdownOptions/Natural
+    -- We use the dropdownOption function to create a new option
+    (Ast.dropdownOption/Natural
+      -- The first argument is the name of the option, which is what the user sees and is always static text
+      "Fortitude"
+      -- If the user picks this option, the dropdown is replace with this value
+      (Ast.literal/Natural 4)
+    )
+    -- Our pair function, which creates a list of dropdown options given two individual ones
+    (Ast.pair/DropdownOptions/Natural
+      (Ast.dropdownOption/Natural
+        "Reflex"
+        (Ast.literal/Natural 3)
+      )
+      (Ast.dropdownOption/Natural
+        "Will"
+        (Ast.literal/Natural 5)
+      )
+    )
+
+-- Convert our options into a dropdown, notice how this just takes on the Ast.Natural type, letting it work with any other Natural functions, as if it were as simple as a literal.
+let savesDropdown : Ast.Natural =
+  -- Create a dropdown given a name and a list of options
+  Ast.dropdown/Natural
+    -- The name is always static text
+    "Save"
+    -- We want to use the options we already assembled
+    savesDropdownOptions
+
+-- Define d20 + the dropdown result
+let d20PlusSave : Ast.Random/Natural =
+  -- Say we're going to add two random things
+  Ast.add/Random/Natural
+    -- The left hand side, our die roll defined above
+    d20
+    -- The right hand side, our saves, which need to be converted to a random number to be compatible
+    (Ast.toRandom/Natural savesDropdown)
+
+-- Define a variable that says what to do with our check: broadcast it!
+let savesCommand : Ast.Command =
+  Ast.roll/Random/Natural d20PlusSave
+
+-- Define a variable with finished macro
+let savesMacro : Text =
+  -- Turn the commands into a finished macro
+  Ast.render
+    -- Turn our single command into the multiple commands type
+    (Ast.singleton/Commands savesCommand)
+
+-- For the purposes of this tutorial, a test validates the output
+let test =
+  assert : savesMacro === "/r (1d20 + ?{Save|Fortitude,4|Dexterity,3|Will,5})"
+
+-- Use the final macro as the output of this file
+in savesMacro
+```
+
+Now we have a pretty powerful building block.
+Note that we can pick a lot more than just numbers!
+If we wanted, this dropdown could select an ability, a table, or a value chosen by yet another dropdown.
+
+Our key definitions are `savesDropdownOptions` and `savesDropdown`.
+It's worth noting that our `d20PlusSave` definition didn't change much from previous examples.
+Even though the right hand side of the addition is now a dropdown, this detail vanishes entirely: it's just an `Ast.Natural` at this point.
+The type of our options (which must all match) becomes the type of our dropdown.
+
+The bulk of the work is happening in `savesDropdownOptions`.
+We're using the `Ast.cons/DropdownOptions/Natural` function to stack items onto the list one at a time; just like we've seen from the `cons`-style function before.
+As mentioned above, we've typically started a list with a `singleton`-style function, but that doesn't exist for dropdown options: we have to use the `Ast.pair/DropdownOptions/Natural` function instead.
+As we build larger dropdowns, we'll want to avoid deep nesting by using the `Ast.fromList2/DropdownOptions/Natural` function and it's varieties.
+This is called `fromList2` because it requires a minimum of two values, which are provided after the list.
+Let's see how it looks if we rewrite `savesDropdownOptions` in this manner.
+
+```dhall
+let savesDropdownOptions : Ast.DropdownOptions/Natural =
+  Ast.fromList2/DropdownOptions/Natural
+    [ Ast.dropdownOption/Natural
+      "Fortitude"
+      (Ast.literal/Natural 4)
+    ]
+    (Ast.dropdownOption/Natural
+      "Reflex"
+      (Ast.literal/Natural 3)
+    )
+    (Ast.dropdownOption/Natural
+      "Will"
+      (Ast.literal/Natural 5)
+    )
+```
+
+Not quite as nice as the regular `fromList` but it gets the job done.
+
+Once we have our dropdown options defined, it's just a matter of converting them into a finished and named dropdown.
+We use the `Ast.dropdown/Natural` function to do this, passing in a name which is always static text.
+From there, we do all the typical things: turn it into a command, turn that into a list of commands, turn that into the final macro, test the output, and then return it.
+
+All together, we introduce the final major tool in the toolbox.
+Dropdowns, specifically when created with Dhall to alleviate all the escaping headaches, allow you to create intricate macros with complex input to simplify the user's experience.
