@@ -883,9 +883,7 @@ let savesDropdownOptions : Ast.DropdownOptions/Natural =
   -- Later we'll show how to use the alternative fromList2 function
   Ast.cons/DropdownOptions/Natural
     -- We use the dropdownOption function to create a new option
-    (Ast.dropdownOption
-      -- DropdownOptions uses a dynamic type, so it can be manipulated later
-      Ast/Natural
+    (Ast.dropdownOption/Natural
       -- The first argument is the name of the option, which is what the user sees and is always static text
       "Fortitude"
       -- If the user picks this option, the dropdown is replace with this value
@@ -893,13 +891,11 @@ let savesDropdownOptions : Ast.DropdownOptions/Natural =
     )
     -- Our pair function, which creates a list of dropdown options given two individual ones
     (Ast.pair/DropdownOptions/Natural
-      (Ast.dropdownOption
-        Ast/Natural
+      (Ast.dropdownOption/Natural
         "Reflex"
         (Ast.literal/Natural 3)
       )
-      (Ast.dropdownOption
-        Ast/Natural
+      (Ast.dropdownOption/Natural
         "Will"
         (Ast.literal/Natural 5)
       )
@@ -961,18 +957,15 @@ Let's see how it looks if we rewrite `savesDropdownOptions` in this manner.
 ```dhall
 let savesDropdownOptions : Ast.DropdownOptions/Natural =
   Ast.fromList2/DropdownOptions/Natural
-    [ Ast.dropdownOption
-      Ast/Natural
+    [ Ast.dropdownOption/Natural
       "Fortitude"
       (Ast.literal/Natural 4)
     ]
-    (Ast.dropdownOption
-      Ast/Natural
+    (Ast.dropdownOption/Natural
       "Reflex"
       (Ast.literal/Natural 3)
     )
-    (Ast.dropdownOption
-      Ast/Natural
+    (Ast.dropdownOption/Natural
       "Will"
       (Ast.literal/Natural 5)
     )

@@ -404,6 +404,38 @@ let Ast/Commands
       forall (cs : Ast/Constructors output) ->
         output.Commands
 
+let Ast/DropdownOption/Natural
+    : Type
+    = DropdownOption Ast/Natural
+
+let Ast/DropdownOption/Integer
+    : Type
+    = DropdownOption Ast/Integer
+
+let Ast/DropdownOption/Random/Natural
+    : Type
+    = DropdownOption Ast/Random/Natural
+
+let Ast/DropdownOption/Random/Integer
+    : Type
+    = DropdownOption Ast/Random/Integer
+
+let Ast/DropdownOption/Text
+    : Type
+    = DropdownOption Ast/Text
+
+let Ast/DropdownOption/TableEntries
+    : Type
+    = DropdownOption Ast/TableEntries
+
+let Ast/DropdownOption/Table
+    : Type
+    = DropdownOption Ast/Table
+
+let Ast/DropdownOption/Command
+    : Type
+    = DropdownOption Ast/Command
+
 let Ast/DropdownOptions/Natural
     : Type
     = forall (output : Ast/Output) ->
@@ -1205,6 +1237,38 @@ let input/Random/Integer
               optionalDefault
           )
 
+let dropdownOption/Natural
+    : Text -> Ast/Natural -> Ast/DropdownOption/Natural
+    = dropdownOption Ast/Natural
+
+let dropdownOption/Integer
+    : Text -> Ast/Integer -> Ast/DropdownOption/Integer
+    = dropdownOption Ast/Integer
+
+let dropdownOption/Random/Natural
+    : Text -> Ast/Random/Natural -> Ast/DropdownOption/Random/Natural
+    = dropdownOption Ast/Random/Natural
+
+let dropdownOption/Random/Integer
+    : Text -> Ast/Random/Integer -> Ast/DropdownOption/Random/Integer
+    = dropdownOption Ast/Random/Integer
+
+let dropdownOption/Text
+    : Text -> Ast/Text -> Ast/DropdownOption/Text
+    = dropdownOption Ast/Text
+
+let dropdownOption/TableEntries
+    : Text -> Ast/TableEntries -> Ast/DropdownOption/TableEntries
+    = dropdownOption Ast/TableEntries
+
+let dropdownOption/Table
+    : Text -> Ast/Table -> Ast/DropdownOption/Table
+    = dropdownOption Ast/Table
+
+let dropdownOption/Command
+    : Text -> Ast/Command -> Ast/DropdownOption/Command
+    = dropdownOption Ast/Command
+
 let dropdown/Natural
     : Text -> Ast/DropdownOptions/Natural -> Ast/Natural
     = \(name : Text) ->
@@ -1884,9 +1948,9 @@ let exampleFromList2DropdownText2 =
                       ( dropdown/Text
                           "X"
                           ( fromList2/DropdownOptions/Text
-                              ([] : List (DropdownOption Ast/Text))
-                              (dropdownOption Ast/Text "a" (literal/Text "1"))
-                              (dropdownOption Ast/Text "b" (literal/Text "2"))
+                              ([] : List Ast/DropdownOption/Text)
+                              (dropdownOption/Text "a" (literal/Text "1"))
+                              (dropdownOption/Text "b" (literal/Text "2"))
                           )
                       )
                   )
@@ -1901,9 +1965,9 @@ let exampleFromList2DropdownText3 =
                       ( dropdown/Text
                           "X"
                           ( fromList2/DropdownOptions/Text
-                              [ dropdownOption Ast/Text "a" (literal/Text "1") ]
-                              (dropdownOption Ast/Text "b" (literal/Text "2"))
-                              (dropdownOption Ast/Text "c" (literal/Text "3"))
+                              [ dropdownOption/Text "a" (literal/Text "1") ]
+                              (dropdownOption/Text "b" (literal/Text "2"))
+                              (dropdownOption/Text "c" (literal/Text "3"))
                           )
                       )
                   )
@@ -1918,11 +1982,11 @@ let exampleFromList2DropdownText4 =
                       ( dropdown/Text
                           "X"
                           ( fromList2/DropdownOptions/Text
-                              [ dropdownOption Ast/Text "a" (literal/Text "1")
-                              , dropdownOption Ast/Text "b" (literal/Text "2")
+                              [ dropdownOption/Text "a" (literal/Text "1")
+                              , dropdownOption/Text "b" (literal/Text "2")
                               ]
-                              (dropdownOption Ast/Text "c" (literal/Text "3"))
-                              (dropdownOption Ast/Text "d" (literal/Text "4"))
+                              (dropdownOption/Text "c" (literal/Text "3"))
+                              (dropdownOption/Text "d" (literal/Text "4"))
                           )
                       )
                   )
@@ -2084,9 +2148,8 @@ let exampleAstNestedStringQueries =
                       ( dropdown/Text
                           "A"
                           ( pair/DropdownOptions/Text
-                              (dropdownOption Ast/Text "1" (literal/Text "A1"))
-                              ( dropdownOption
-                                  Ast/Text
+                              (dropdownOption/Text "1" (literal/Text "A1"))
+                              ( dropdownOption/Text
                                   "2"
                                   ( plusPlus/Text
                                       ( literal/Text
@@ -2095,13 +2158,11 @@ let exampleAstNestedStringQueries =
                                       ( dropdown/Text
                                           "B"
                                           ( pair/DropdownOptions/Text
-                                              ( dropdownOption
-                                                  Ast/Text
+                                              ( dropdownOption/Text
                                                   "1"
                                                   (literal/Text "A2B1")
                                               )
-                                              ( dropdownOption
-                                                  Ast/Text
+                                              ( dropdownOption/Text
                                                   "2"
                                                   (literal/Text "A2B2")
                                               )
@@ -2123,9 +2184,8 @@ let exampleAstQueryDepthIsPreservedByTheConversionFromNaturalToText =
                       ( dropdown/Text
                           "A"
                           ( pair/DropdownOptions/Text
-                              (dropdownOption Ast/Text "1" (literal/Text "A1"))
-                              ( dropdownOption
-                                  Ast/Text
+                              (dropdownOption/Text "1" (literal/Text "A1"))
+                              ( dropdownOption/Text
                                   "2"
                                   ( plusPlus/Text
                                       ( literal/Text
@@ -2135,13 +2195,11 @@ let exampleAstQueryDepthIsPreservedByTheConversionFromNaturalToText =
                                           ( dropdown/Natural
                                               "B"
                                               ( pair/DropdownOptions/Natural
-                                                  ( dropdownOption
-                                                      Ast/Natural
+                                                  ( dropdownOption/Natural
                                                       "1"
                                                       (literal/Natural 1221)
                                                   )
-                                                  ( dropdownOption
-                                                      Ast/Natural
+                                                  ( dropdownOption/Natural
                                                       "2"
                                                       (literal/Natural 1222)
                                                   )
@@ -2165,19 +2223,16 @@ let exampleAstDropdownOptionList =
                           ( dropdown/Natural
                               "Dropdown"
                               ( cons/DropdownOptions/Natural
-                                  ( dropdownOption
-                                      Ast/Natural
+                                  ( dropdownOption/Natural
                                       "A"
                                       (literal/Natural 1)
                                   )
                                   ( pair/DropdownOptions/Natural
-                                      ( dropdownOption
-                                          Ast/Natural
+                                      ( dropdownOption/Natural
                                           "B"
                                           (literal/Natural 2)
                                       )
-                                      ( dropdownOption
-                                          Ast/Natural
+                                      ( dropdownOption/Natural
                                           "C"
                                           (literal/Natural 3)
                                       )
@@ -2201,6 +2256,14 @@ in  { Character
     , Table = Ast/Table
     , Command = Ast/Command
     , Commands = Ast/Commands
+    , DropdownOption/Natural = Ast/DropdownOption/Natural
+    , DropdownOption/Integer = Ast/DropdownOption/Integer
+    , DropdownOption/Random/Natural = Ast/DropdownOption/Random/Natural
+    , DropdownOption/Random/Integer = Ast/DropdownOption/Random/Integer
+    , DropdownOption/Text = Ast/DropdownOption/Text
+    , DropdownOption/TableEntries = Ast/DropdownOption/TableEntries
+    , DropdownOption/Table = Ast/DropdownOption/Table
+    , DropdownOption/Command = Ast/DropdownOption/Command
     , DropdownOptions/Natural = Ast/DropdownOptions/Natural
     , DropdownOptions/Integer = Ast/DropdownOptions/Integer
     , DropdownOptions/Random/Natural = Ast/DropdownOptions/Random/Natural
@@ -2247,6 +2310,14 @@ in  { Character
     , input/Command
     , input/Random/Natural
     , input/Random/Integer
+    , dropdownOption/Natural
+    , dropdownOption/Integer
+    , dropdownOption/Random/Natural
+    , dropdownOption/Random/Integer
+    , dropdownOption/Text
+    , dropdownOption/TableEntries
+    , dropdownOption/Table
+    , dropdownOption/Command
     , dropdown/Natural
     , dropdown/Integer
     , dropdown/Random/Natural
