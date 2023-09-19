@@ -38,6 +38,18 @@ let List/monoFold =
 
 let Character = < Target | Selected | Named : Text | Implicit >
 
+let DropdownOption = \(a : Type) -> { label : Text, value : a }
+
+let dropdownOption =
+      \(a : Type) -> \(label : Text) -> \(value : a) -> { label, value }
+
+let DropdownOption/map =
+      \(a : Type) ->
+      \(b : Type) ->
+      \(f : a -> b) ->
+      \(x : DropdownOption a) ->
+        { label = x.label, value = f x.value }
+
 let Ast/Output =
       { Natural : Type
       , Integer : Type
@@ -47,7 +59,6 @@ let Ast/Output =
       , Table : Type
       , Command : Type
       , Commands : Type
-      , DropdownOption : Type -> Type
       , DropdownOptions : Type -> Type
       }
 
@@ -75,49 +86,44 @@ let Ast/Constructors =
           , Pair :
               { DropdownOptions :
                   { Natural :
-                      output.DropdownOption output.Natural ->
-                      output.DropdownOption output.Natural ->
+                      DropdownOption output.Natural ->
+                      DropdownOption output.Natural ->
                         output.DropdownOptions output.Natural
                   , Integer :
-                      output.DropdownOption output.Integer ->
-                      output.DropdownOption output.Integer ->
+                      DropdownOption output.Integer ->
+                      DropdownOption output.Integer ->
                         output.DropdownOptions output.Integer
                   , Random :
                       { Natural :
-                          output.DropdownOption
-                            (output.Random output.Natural) ->
-                          output.DropdownOption
-                            (output.Random output.Natural) ->
+                          DropdownOption (output.Random output.Natural) ->
+                          DropdownOption (output.Random output.Natural) ->
                             output.DropdownOptions
                               (output.Random output.Natural)
                       , Integer :
-                          output.DropdownOption
-                            (output.Random output.Integer) ->
-                          output.DropdownOption
-                            (output.Random output.Integer) ->
+                          DropdownOption (output.Random output.Integer) ->
+                          DropdownOption (output.Random output.Integer) ->
                             output.DropdownOptions
                               (output.Random output.Integer)
                       }
                   , Text :
-                      output.DropdownOption output.Text ->
-                      output.DropdownOption output.Text ->
+                      DropdownOption output.Text ->
+                      DropdownOption output.Text ->
                         output.DropdownOptions output.Text
                   , TableEntries :
-                      output.DropdownOption output.TableEntries ->
-                      output.DropdownOption output.TableEntries ->
+                      DropdownOption output.TableEntries ->
+                      DropdownOption output.TableEntries ->
                         output.DropdownOptions output.TableEntries
                   , Table :
-                      output.DropdownOption output.Table ->
-                      output.DropdownOption output.Table ->
+                      DropdownOption output.Table ->
+                      DropdownOption output.Table ->
                         output.DropdownOptions output.Table
                   , Command :
-                      output.DropdownOption output.Command ->
-                      output.DropdownOption output.Command ->
+                      DropdownOption output.Command ->
+                      DropdownOption output.Command ->
                         output.DropdownOptions output.Command
                   }
               }
-          , Table :
-              Optional output.Text -> output.TableEntries -> output.Table
+          , Table : Optional output.Text -> output.TableEntries -> output.Table
           , Macro :
               { Natural : Text -> output.Natural
               , Integer : Text -> output.Integer
@@ -160,31 +166,6 @@ let Ast/Constructors =
                         output.Random output.Integer
                   }
               , Command : Text -> Optional output.Command -> output.Command
-              }
-          , DropdownOption :
-              { Natural :
-                  Text -> output.Natural -> output.DropdownOption output.Natural
-              , Integer :
-                  Text -> output.Integer -> output.DropdownOption output.Integer
-              , Random :
-                  { Natural :
-                      Text ->
-                      output.Random output.Natural ->
-                        output.DropdownOption (output.Random output.Natural)
-                  , Integer :
-                      Text ->
-                      output.Random output.Integer ->
-                        output.DropdownOption (output.Random output.Integer)
-                  }
-              , Text : Text -> output.Text -> output.DropdownOption output.Text
-              , TableEntries :
-                  Text ->
-                  output.TableEntries ->
-                    output.DropdownOption output.TableEntries
-              , Table :
-                  Text -> output.Table -> output.DropdownOption output.Table
-              , Command :
-                  Text -> output.Command -> output.DropdownOption output.Command
               }
           , Dropdown :
               { Natural :
@@ -264,43 +245,41 @@ let Ast/Constructors =
           , Cons :
               { DropdownOptions :
                   { Natural :
-                      output.DropdownOption output.Natural ->
+                      DropdownOption output.Natural ->
                       output.DropdownOptions output.Natural ->
                         output.DropdownOptions output.Natural
                   , Integer :
-                      output.DropdownOption output.Integer ->
+                      DropdownOption output.Integer ->
                       output.DropdownOptions output.Integer ->
                         output.DropdownOptions output.Integer
                   , Random :
                       { Natural :
-                          output.DropdownOption
-                            (output.Random output.Natural) ->
+                          DropdownOption (output.Random output.Natural) ->
                           output.DropdownOptions
                             (output.Random output.Natural) ->
                             output.DropdownOptions
                               (output.Random output.Natural)
                       , Integer :
-                          output.DropdownOption
-                            (output.Random output.Integer) ->
+                          DropdownOption (output.Random output.Integer) ->
                           output.DropdownOptions
                             (output.Random output.Integer) ->
                             output.DropdownOptions
                               (output.Random output.Integer)
                       }
                   , Text :
-                      output.DropdownOption output.Text ->
+                      DropdownOption output.Text ->
                       output.DropdownOptions output.Text ->
                         output.DropdownOptions output.Text
                   , TableEntries :
-                      output.DropdownOption output.TableEntries ->
+                      DropdownOption output.TableEntries ->
                       output.DropdownOptions output.TableEntries ->
                         output.DropdownOptions output.TableEntries
                   , Table :
-                      output.DropdownOption output.Table ->
+                      DropdownOption output.Table ->
                       output.DropdownOptions output.Table ->
                         output.DropdownOptions output.Table
                   , Command :
-                      output.DropdownOption output.Command ->
+                      DropdownOption output.Command ->
                       output.DropdownOptions output.Command ->
                         output.DropdownOptions output.Command
                   }
@@ -425,54 +404,6 @@ let Ast/Commands
       forall (cs : Ast/Constructors output) ->
         output.Commands
 
-let Ast/DropdownOption/Natural
-    : Type
-    = forall (output : Ast/Output) ->
-      forall (cs : Ast/Constructors output) ->
-        output.DropdownOption output.Natural
-
-let Ast/DropdownOption/Integer
-    : Type
-    = forall (output : Ast/Output) ->
-      forall (cs : Ast/Constructors output) ->
-        output.DropdownOption output.Integer
-
-let Ast/DropdownOption/Random/Natural
-    : Type
-    = forall (output : Ast/Output) ->
-      forall (cs : Ast/Constructors output) ->
-        output.DropdownOption (output.Random output.Natural)
-
-let Ast/DropdownOption/Random/Integer
-    : Type
-    = forall (output : Ast/Output) ->
-      forall (cs : Ast/Constructors output) ->
-        output.DropdownOption (output.Random output.Integer)
-
-let Ast/DropdownOption/Text
-    : Type
-    = forall (output : Ast/Output) ->
-      forall (cs : Ast/Constructors output) ->
-        output.DropdownOption output.Text
-
-let Ast/DropdownOption/TableEntries
-    : Type
-    = forall (output : Ast/Output) ->
-      forall (cs : Ast/Constructors output) ->
-        output.DropdownOption output.TableEntries
-
-let Ast/DropdownOption/Table
-    : Type
-    = forall (output : Ast/Output) ->
-      forall (cs : Ast/Constructors output) ->
-        output.DropdownOption output.Table
-
-let Ast/DropdownOption/Command
-    : Type
-    = forall (output : Ast/Output) ->
-      forall (cs : Ast/Constructors output) ->
-        output.DropdownOption output.Command
-
 let Ast/DropdownOptions/Natural
     : Type
     = forall (output : Ast/Output) ->
@@ -567,6 +498,11 @@ let renderBroadcastAs = renderToCommand "as"
 
 let renderEmoteAs = renderToCommand "emas"
 
+let renderDropdownOption =
+      \(queryDepth : Natural) ->
+      \(x : DropdownOption Text) ->
+        x.label ++ renderQueryComma queryDepth ++ x.value
+
 let render
     : Ast/Commands -> Text
     = \(x : Ast/Commands) ->
@@ -579,7 +515,6 @@ let render
           , Table = Text
           , Command = Text
           , Commands = Text
-          , DropdownOption = \(a : Type) -> Text
           , DropdownOptions = \(a : Type) -> Text
           }
           ( \(queryDepth : Natural) ->
@@ -612,9 +547,11 @@ let render
               , Pair.DropdownOptions
                 =
                   let f =
-                        \(a : Text) ->
-                        \(b : Text) ->
-                          a ++ renderQueryPipe queryDepth ++ b
+                        \(a : DropdownOption Text) ->
+                        \(b : DropdownOption Text) ->
+                              renderDropdownOption queryDepth a
+                          ++  renderQueryPipe queryDepth
+                          ++  renderDropdownOption queryDepth b
 
                   in  { Natural = f
                       , Integer = f
@@ -711,20 +648,6 @@ let render
                       , Text = f
                       , Command = f
                       }
-              , DropdownOption =
-                  let f =
-                        \(key : Text) ->
-                        \(value : Text) ->
-                          key ++ renderQueryComma queryDepth ++ value
-
-                  in  { Natural = f
-                      , Integer = f
-                      , Random = { Natural = f, Integer = f }
-                      , Text = f
-                      , TableEntries = f
-                      , Table = f
-                      , Command = f
-                      }
               , Dropdown =
                   let f =
                         \(name : Text) ->
@@ -767,9 +690,11 @@ let render
               , Cons =
                 { DropdownOptions =
                     let f =
-                          \(x : Text) ->
+                          \(x : DropdownOption Text) ->
                           \(xs : Text) ->
-                            x ++ renderQueryPipe queryDepth ++ xs
+                                renderDropdownOption queryDepth x
+                            ++  renderQueryPipe queryDepth
+                            ++  xs
 
                     in  { Natural = f
                         , Integer = f
@@ -873,84 +798,192 @@ let singleton/Commands
         (cs 0).Singleton.Commands (command output cs)
 
 let pair/DropdownOptions/Natural
-    : Ast/DropdownOption/Natural ->
-      Ast/DropdownOption/Natural ->
+    : DropdownOption Ast/Natural ->
+      DropdownOption Ast/Natural ->
         Ast/DropdownOptions/Natural
-    = \(a : Ast/DropdownOption/Natural) ->
-      \(b : Ast/DropdownOption/Natural) ->
+    = \(a : DropdownOption Ast/Natural) ->
+      \(b : DropdownOption Ast/Natural) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Pair.DropdownOptions.Natural (a output cs) (b output cs)
+        (cs 0).Pair.DropdownOptions.Natural
+          ( DropdownOption/map
+              Ast/Natural
+              output.Natural
+              (\(x : Ast/Natural) -> x output (\(d : Natural) -> cs (d + 1)))
+              a
+          )
+          ( DropdownOption/map
+              Ast/Natural
+              output.Natural
+              (\(x : Ast/Natural) -> x output (\(d : Natural) -> cs (d + 1)))
+              b
+          )
 
 let pair/DropdownOptions/Integer
-    : Ast/DropdownOption/Integer ->
-      Ast/DropdownOption/Integer ->
+    : DropdownOption Ast/Integer ->
+      DropdownOption Ast/Integer ->
         Ast/DropdownOptions/Integer
-    = \(a : Ast/DropdownOption/Integer) ->
-      \(b : Ast/DropdownOption/Integer) ->
+    = \(a : DropdownOption Ast/Integer) ->
+      \(b : DropdownOption Ast/Integer) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Pair.DropdownOptions.Integer (a output cs) (b output cs)
+        (cs 0).Pair.DropdownOptions.Integer
+          ( DropdownOption/map
+              Ast/Integer
+              output.Integer
+              (\(x : Ast/Integer) -> x output (\(d : Natural) -> cs (d + 1)))
+              a
+          )
+          ( DropdownOption/map
+              Ast/Integer
+              output.Integer
+              (\(x : Ast/Integer) -> x output (\(d : Natural) -> cs (d + 1)))
+              b
+          )
 
 let pair/DropdownOptions/Random/Natural
-    : Ast/DropdownOption/Random/Natural ->
-      Ast/DropdownOption/Random/Natural ->
+    : DropdownOption Ast/Random/Natural ->
+      DropdownOption Ast/Random/Natural ->
         Ast/DropdownOptions/Random/Natural
-    = \(a : Ast/DropdownOption/Random/Natural) ->
-      \(b : Ast/DropdownOption/Random/Natural) ->
+    = \(a : DropdownOption Ast/Random/Natural) ->
+      \(b : DropdownOption Ast/Random/Natural) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Pair.DropdownOptions.Random.Natural (a output cs) (b output cs)
+        (cs 0).Pair.DropdownOptions.Random.Natural
+          ( DropdownOption/map
+              Ast/Random/Natural
+              (output.Random output.Natural)
+              ( \(x : Ast/Random/Natural) ->
+                  x output (\(d : Natural) -> cs (d + 1))
+              )
+              a
+          )
+          ( DropdownOption/map
+              Ast/Random/Natural
+              (output.Random output.Natural)
+              ( \(x : Ast/Random/Natural) ->
+                  x output (\(d : Natural) -> cs (d + 1))
+              )
+              a
+          )
 
 let pair/DropdownOptions/Random/Integer
-    : Ast/DropdownOption/Random/Integer ->
-      Ast/DropdownOption/Random/Integer ->
+    : DropdownOption Ast/Random/Integer ->
+      DropdownOption Ast/Random/Integer ->
         Ast/DropdownOptions/Random/Integer
-    = \(a : Ast/DropdownOption/Random/Integer) ->
-      \(b : Ast/DropdownOption/Random/Integer) ->
+    = \(a : DropdownOption Ast/Random/Integer) ->
+      \(b : DropdownOption Ast/Random/Integer) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Pair.DropdownOptions.Random.Integer (a output cs) (b output cs)
+        (cs 0).Pair.DropdownOptions.Random.Integer
+          ( DropdownOption/map
+              Ast/Random/Integer
+              (output.Random output.Integer)
+              ( \(x : Ast/Random/Integer) ->
+                  x output (\(d : Natural) -> cs (d + 1))
+              )
+              a
+          )
+          ( DropdownOption/map
+              Ast/Random/Integer
+              (output.Random output.Integer)
+              ( \(x : Ast/Random/Integer) ->
+                  x output (\(d : Natural) -> cs (d + 1))
+              )
+              a
+          )
 
 let pair/DropdownOptions/Text
-    : Ast/DropdownOption/Text ->
-      Ast/DropdownOption/Text ->
+    : DropdownOption Ast/Text ->
+      DropdownOption Ast/Text ->
         Ast/DropdownOptions/Text
-    = \(a : Ast/DropdownOption/Text) ->
-      \(b : Ast/DropdownOption/Text) ->
+    = \(a : DropdownOption Ast/Text) ->
+      \(b : DropdownOption Ast/Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Pair.DropdownOptions.Text (a output cs) (b output cs)
+        (cs 0).Pair.DropdownOptions.Text
+          ( DropdownOption/map
+              Ast/Text
+              output.Text
+              (\(x : Ast/Text) -> x output (\(d : Natural) -> cs (d + 1)))
+              a
+          )
+          ( DropdownOption/map
+              Ast/Text
+              output.Text
+              (\(x : Ast/Text) -> x output (\(d : Natural) -> cs (d + 1)))
+              b
+          )
 
 let pair/DropdownOptions/TableEntries
-    : Ast/DropdownOption/TableEntries ->
-      Ast/DropdownOption/TableEntries ->
+    : DropdownOption Ast/TableEntries ->
+      DropdownOption Ast/TableEntries ->
         Ast/DropdownOptions/TableEntries
-    = \(a : Ast/DropdownOption/TableEntries) ->
-      \(b : Ast/DropdownOption/TableEntries) ->
+    = \(a : DropdownOption Ast/TableEntries) ->
+      \(b : DropdownOption Ast/TableEntries) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Pair.DropdownOptions.TableEntries (a output cs) (b output cs)
+        (cs 0).Pair.DropdownOptions.TableEntries
+          ( DropdownOption/map
+              Ast/TableEntries
+              output.TableEntries
+              ( \(x : Ast/TableEntries) ->
+                  x output (\(d : Natural) -> cs (d + 1))
+              )
+              a
+          )
+          ( DropdownOption/map
+              Ast/TableEntries
+              output.TableEntries
+              ( \(x : Ast/TableEntries) ->
+                  x output (\(d : Natural) -> cs (d + 1))
+              )
+              b
+          )
 
 let pair/DropdownOptions/Table
-    : Ast/DropdownOption/Table ->
-      Ast/DropdownOption/Table ->
+    : DropdownOption Ast/Table ->
+      DropdownOption Ast/Table ->
         Ast/DropdownOptions/Table
-    = \(a : Ast/DropdownOption/Table) ->
-      \(b : Ast/DropdownOption/Table) ->
+    = \(a : DropdownOption Ast/Table) ->
+      \(b : DropdownOption Ast/Table) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Pair.DropdownOptions.Table (a output cs) (b output cs)
+        (cs 0).Pair.DropdownOptions.Table
+          ( DropdownOption/map
+              Ast/Table
+              output.Table
+              (\(x : Ast/Table) -> x output (\(d : Natural) -> cs (d + 1)))
+              a
+          )
+          ( DropdownOption/map
+              Ast/Table
+              output.Table
+              (\(x : Ast/Table) -> x output (\(d : Natural) -> cs (d + 1)))
+              b
+          )
 
 let pair/DropdownOptions/Command
-    : Ast/DropdownOption/Command ->
-      Ast/DropdownOption/Command ->
+    : DropdownOption Ast/Command ->
+      DropdownOption Ast/Command ->
         Ast/DropdownOptions/Command
-    = \(a : Ast/DropdownOption/Command) ->
-      \(b : Ast/DropdownOption/Command) ->
+    = \(a : DropdownOption Ast/Command) ->
+      \(b : DropdownOption Ast/Command) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Pair.DropdownOptions.Command (a output cs) (b output cs)
+        (cs 0).Pair.DropdownOptions.Command
+          ( DropdownOption/map
+              Ast/Command
+              output.Command
+              (\(x : Ast/Command) -> x output (\(d : Natural) -> cs (d + 1)))
+              a
+          )
+          ( DropdownOption/map
+              Ast/Command
+              output.Command
+              (\(x : Ast/Command) -> x output (\(d : Natural) -> cs (d + 1)))
+              b
+          )
 
 let table
     : Optional Ast/Text -> Ast/TableEntries -> Ast/Table
@@ -1172,86 +1205,6 @@ let input/Random/Integer
               optionalDefault
           )
 
-let dropdownOption/Natural
-    : Text -> Ast/Natural -> Ast/DropdownOption/Natural
-    = \(key : Text) ->
-      \(value : Ast/Natural) ->
-      \(output : Ast/Output) ->
-      \(cs : Ast/Constructors output) ->
-        (cs 0).DropdownOption.Natural
-          key
-          (value output (\(d : Natural) -> cs (d + 1)))
-
-let dropdownOption/Integer
-    : Text -> Ast/Integer -> Ast/DropdownOption/Integer
-    = \(key : Text) ->
-      \(value : Ast/Integer) ->
-      \(output : Ast/Output) ->
-      \(cs : Ast/Constructors output) ->
-        (cs 0).DropdownOption.Integer
-          key
-          (value output (\(d : Natural) -> cs (d + 1)))
-
-let dropdownOption/Random/Natural
-    : Text -> Ast/Random/Natural -> Ast/DropdownOption/Random/Natural
-    = \(key : Text) ->
-      \(value : Ast/Random/Natural) ->
-      \(output : Ast/Output) ->
-      \(cs : Ast/Constructors output) ->
-        (cs 0).DropdownOption.Random.Natural
-          key
-          (value output (\(d : Natural) -> cs (d + 1)))
-
-let dropdownOption/Random/Integer
-    : Text -> Ast/Random/Integer -> Ast/DropdownOption/Random/Integer
-    = \(key : Text) ->
-      \(value : Ast/Random/Integer) ->
-      \(output : Ast/Output) ->
-      \(cs : Ast/Constructors output) ->
-        (cs 0).DropdownOption.Random.Integer
-          key
-          (value output (\(d : Natural) -> cs (d + 1)))
-
-let dropdownOption/Text
-    : Text -> Ast/Text -> Ast/DropdownOption/Text
-    = \(key : Text) ->
-      \(value : Ast/Text) ->
-      \(output : Ast/Output) ->
-      \(cs : Ast/Constructors output) ->
-        (cs 0).DropdownOption.Text
-          key
-          (value output (\(d : Natural) -> cs (d + 1)))
-
-let dropdownOption/TableEntries
-    : Text -> Ast/TableEntries -> Ast/DropdownOption/TableEntries
-    = \(key : Text) ->
-      \(value : Ast/TableEntries) ->
-      \(output : Ast/Output) ->
-      \(cs : Ast/Constructors output) ->
-        (cs 0).DropdownOption.TableEntries
-          key
-          (value output (\(d : Natural) -> cs (d + 1)))
-
-let dropdownOption/Table
-    : Text -> Ast/Table -> Ast/DropdownOption/Table
-    = \(key : Text) ->
-      \(value : Ast/Table) ->
-      \(output : Ast/Output) ->
-      \(cs : Ast/Constructors output) ->
-        (cs 0).DropdownOption.Table
-          key
-          (value output (\(d : Natural) -> cs (d + 1)))
-
-let dropdownOption/Command
-    : Text -> Ast/Command -> Ast/DropdownOption/Command
-    = \(key : Text) ->
-      \(value : Ast/Command) ->
-      \(output : Ast/Output) ->
-      \(cs : Ast/Constructors output) ->
-        (cs 0).DropdownOption.Command
-          key
-          (value output (\(d : Natural) -> cs (d + 1)))
-
 let dropdown/Natural
     : Text -> Ast/DropdownOptions/Natural -> Ast/Natural
     = \(name : Text) ->
@@ -1391,84 +1344,156 @@ let label/Natural
         (cs 0).Labeled.Natural (label output cs) (x output cs)
 
 let cons/DropdownOptions/Natural
-    : Ast/DropdownOption/Natural ->
+    : DropdownOption Ast/Natural ->
       Ast/DropdownOptions/Natural ->
         Ast/DropdownOptions/Natural
-    = \(x : Ast/DropdownOption/Natural) ->
+    = \(x : DropdownOption Ast/Natural) ->
       \(xs : Ast/DropdownOptions/Natural) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Cons.DropdownOptions.Natural (x output cs) (xs output cs)
+        (cs 0).Cons.DropdownOptions.Natural
+          ( DropdownOption/map
+              Ast/Natural
+              output.Natural
+              ( \(value : Ast/Natural) ->
+                  value output (\(d : Natural) -> cs (d + 1))
+              )
+              x
+          )
+          (xs output cs)
 
 let cons/DropdownOptions/Integer
-    : Ast/DropdownOption/Integer ->
+    : DropdownOption Ast/Integer ->
       Ast/DropdownOptions/Integer ->
         Ast/DropdownOptions/Integer
-    = \(x : Ast/DropdownOption/Integer) ->
+    = \(x : DropdownOption Ast/Integer) ->
       \(xs : Ast/DropdownOptions/Integer) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Cons.DropdownOptions.Integer (x output cs) (xs output cs)
+        (cs 0).Cons.DropdownOptions.Integer
+          ( DropdownOption/map
+              Ast/Integer
+              output.Integer
+              ( \(value : Ast/Integer) ->
+                  value output (\(d : Natural) -> cs (d + 1))
+              )
+              x
+          )
+          (xs output cs)
 
 let cons/DropdownOptions/Random/Natural
-    : Ast/DropdownOption/Random/Natural ->
+    : DropdownOption Ast/Random/Natural ->
       Ast/DropdownOptions/Random/Natural ->
         Ast/DropdownOptions/Random/Natural
-    = \(x : Ast/DropdownOption/Random/Natural) ->
+    = \(x : DropdownOption Ast/Random/Natural) ->
       \(xs : Ast/DropdownOptions/Random/Natural) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Cons.DropdownOptions.Random.Natural (x output cs) (xs output cs)
+        (cs 0).Cons.DropdownOptions.Random.Natural
+          ( DropdownOption/map
+              Ast/Random/Natural
+              (output.Random output.Natural)
+              ( \(value : Ast/Random/Natural) ->
+                  value output (\(d : Natural) -> cs (d + 1))
+              )
+              x
+          )
+          (xs output cs)
 
 let cons/DropdownOptions/Random/Integer
-    : Ast/DropdownOption/Random/Integer ->
+    : DropdownOption Ast/Random/Integer ->
       Ast/DropdownOptions/Random/Integer ->
         Ast/DropdownOptions/Random/Integer
-    = \(x : Ast/DropdownOption/Random/Integer) ->
+    = \(x : DropdownOption Ast/Random/Integer) ->
       \(xs : Ast/DropdownOptions/Random/Integer) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Cons.DropdownOptions.Random.Integer (x output cs) (xs output cs)
+        (cs 0).Cons.DropdownOptions.Random.Integer
+          ( DropdownOption/map
+              Ast/Random/Integer
+              (output.Random output.Integer)
+              ( \(value : Ast/Random/Integer) ->
+                  value output (\(d : Natural) -> cs (d + 1))
+              )
+              x
+          )
+          (xs output cs)
 
 let cons/DropdownOptions/Text
-    : Ast/DropdownOption/Text ->
+    : DropdownOption Ast/Text ->
       Ast/DropdownOptions/Text ->
         Ast/DropdownOptions/Text
-    = \(x : Ast/DropdownOption/Text) ->
+    = \(x : DropdownOption Ast/Text) ->
       \(xs : Ast/DropdownOptions/Text) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Cons.DropdownOptions.Text (x output cs) (xs output cs)
+        (cs 0).Cons.DropdownOptions.Text
+          ( DropdownOption/map
+              Ast/Text
+              output.Text
+              ( \(value : Ast/Text) ->
+                  value output (\(d : Natural) -> cs (d + 1))
+              )
+              x
+          )
+          (xs output cs)
 
 let cons/DropdownOptions/TableEntries
-    : Ast/DropdownOption/TableEntries ->
+    : DropdownOption Ast/TableEntries ->
       Ast/DropdownOptions/TableEntries ->
         Ast/DropdownOptions/TableEntries
-    = \(x : Ast/DropdownOption/TableEntries) ->
+    = \(x : DropdownOption Ast/TableEntries) ->
       \(xs : Ast/DropdownOptions/TableEntries) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Cons.DropdownOptions.TableEntries (x output cs) (xs output cs)
+        (cs 0).Cons.DropdownOptions.TableEntries
+          ( DropdownOption/map
+              Ast/TableEntries
+              output.TableEntries
+              ( \(value : Ast/TableEntries) ->
+                  value output (\(d : Natural) -> cs (d + 1))
+              )
+              x
+          )
+          (xs output cs)
 
 let cons/DropdownOptions/Table
-    : Ast/DropdownOption/Table ->
+    : DropdownOption Ast/Table ->
       Ast/DropdownOptions/Table ->
         Ast/DropdownOptions/Table
-    = \(x : Ast/DropdownOption/Table) ->
+    = \(x : DropdownOption Ast/Table) ->
       \(xs : Ast/DropdownOptions/Table) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Cons.DropdownOptions.Table (x output cs) (xs output cs)
+        (cs 0).Cons.DropdownOptions.Table
+          ( DropdownOption/map
+              Ast/Table
+              output.Table
+              ( \(value : Ast/Table) ->
+                  value output (\(d : Natural) -> cs (d + 1))
+              )
+              x
+          )
+          (xs output cs)
 
 let cons/DropdownOptions/Command
-    : Ast/DropdownOption/Command ->
+    : DropdownOption Ast/Command ->
       Ast/DropdownOptions/Command ->
         Ast/DropdownOptions/Command
-    = \(x : Ast/DropdownOption/Command) ->
+    = \(x : DropdownOption Ast/Command) ->
       \(xs : Ast/DropdownOptions/Command) ->
       \(output : Ast/Output) ->
       \(cs : Ast/Constructors output) ->
-        (cs 0).Cons.DropdownOptions.Command (x output cs) (xs output cs)
+        (cs 0).Cons.DropdownOptions.Command
+          ( DropdownOption/map
+              Ast/Command
+              output.Command
+              ( \(value : Ast/Command) ->
+                  value output (\(d : Natural) -> cs (d + 1))
+              )
+              x
+          )
+          (xs output cs)
 
 let cons/Commands
     : Ast/Command -> Ast/Commands -> Ast/Commands
@@ -1489,89 +1514,89 @@ let fromList2 =
         List/fold t list ts f (pair secondToLast last)
 
 let fromList2/DropdownOptions/Natural
-    : List Ast/DropdownOption/Natural ->
-      Ast/DropdownOption/Natural ->
-      Ast/DropdownOption/Natural ->
+    : List (DropdownOption Ast/Natural) ->
+      DropdownOption Ast/Natural ->
+      DropdownOption Ast/Natural ->
         Ast/DropdownOptions/Natural
     = fromList2
-        Ast/DropdownOption/Natural
+        (DropdownOption Ast/Natural)
         Ast/DropdownOptions/Natural
         cons/DropdownOptions/Natural
         pair/DropdownOptions/Natural
 
 let fromList2/DropdownOptions/Integer
-    : List Ast/DropdownOption/Integer ->
-      Ast/DropdownOption/Integer ->
-      Ast/DropdownOption/Integer ->
+    : List (DropdownOption Ast/Integer) ->
+      DropdownOption Ast/Integer ->
+      DropdownOption Ast/Integer ->
         Ast/DropdownOptions/Integer
     = fromList2
-        Ast/DropdownOption/Integer
+        (DropdownOption Ast/Integer)
         Ast/DropdownOptions/Integer
         cons/DropdownOptions/Integer
         pair/DropdownOptions/Integer
 
 let fromList2/DropdownOptions/Random/Natural
-    : List Ast/DropdownOption/Random/Natural ->
-      Ast/DropdownOption/Random/Natural ->
-      Ast/DropdownOption/Random/Natural ->
+    : List (DropdownOption Ast/Random/Natural) ->
+      DropdownOption Ast/Random/Natural ->
+      DropdownOption Ast/Random/Natural ->
         Ast/DropdownOptions/Random/Natural
     = fromList2
-        Ast/DropdownOption/Random/Natural
+        (DropdownOption Ast/Random/Natural)
         Ast/DropdownOptions/Random/Natural
         cons/DropdownOptions/Random/Natural
         pair/DropdownOptions/Random/Natural
 
 let fromList2/DropdownOptions/Random/Integer
-    : List Ast/DropdownOption/Random/Integer ->
-      Ast/DropdownOption/Random/Integer ->
-      Ast/DropdownOption/Random/Integer ->
+    : List (DropdownOption Ast/Random/Integer) ->
+      DropdownOption Ast/Random/Integer ->
+      DropdownOption Ast/Random/Integer ->
         Ast/DropdownOptions/Random/Integer
     = fromList2
-        Ast/DropdownOption/Random/Integer
+        (DropdownOption Ast/Random/Integer)
         Ast/DropdownOptions/Random/Integer
         cons/DropdownOptions/Random/Integer
         pair/DropdownOptions/Random/Integer
 
 let fromList2/DropdownOptions/Text
-    : List Ast/DropdownOption/Text ->
-      Ast/DropdownOption/Text ->
-      Ast/DropdownOption/Text ->
+    : List (DropdownOption Ast/Text) ->
+      DropdownOption Ast/Text ->
+      DropdownOption Ast/Text ->
         Ast/DropdownOptions/Text
     = fromList2
-        Ast/DropdownOption/Text
+        (DropdownOption Ast/Text)
         Ast/DropdownOptions/Text
         cons/DropdownOptions/Text
         pair/DropdownOptions/Text
 
 let fromList2/DropdownOptions/TableEntries
-    : List Ast/DropdownOption/TableEntries ->
-      Ast/DropdownOption/TableEntries ->
-      Ast/DropdownOption/TableEntries ->
+    : List (DropdownOption Ast/TableEntries) ->
+      DropdownOption Ast/TableEntries ->
+      DropdownOption Ast/TableEntries ->
         Ast/DropdownOptions/TableEntries
     = fromList2
-        Ast/DropdownOption/TableEntries
+        (DropdownOption Ast/TableEntries)
         Ast/DropdownOptions/TableEntries
         cons/DropdownOptions/TableEntries
         pair/DropdownOptions/TableEntries
 
 let fromList2/DropdownOptions/Table
-    : List Ast/DropdownOption/Table ->
-      Ast/DropdownOption/Table ->
-      Ast/DropdownOption/Table ->
+    : List (DropdownOption Ast/Table) ->
+      DropdownOption Ast/Table ->
+      DropdownOption Ast/Table ->
         Ast/DropdownOptions/Table
     = fromList2
-        Ast/DropdownOption/Table
+        (DropdownOption Ast/Table)
         Ast/DropdownOptions/Table
         cons/DropdownOptions/Table
         pair/DropdownOptions/Table
 
 let fromList2/DropdownOptions/Command
-    : List Ast/DropdownOption/Command ->
-      Ast/DropdownOption/Command ->
-      Ast/DropdownOption/Command ->
+    : List (DropdownOption Ast/Command) ->
+      DropdownOption Ast/Command ->
+      DropdownOption Ast/Command ->
         Ast/DropdownOptions/Command
     = fromList2
-        Ast/DropdownOption/Command
+        (DropdownOption Ast/Command)
         Ast/DropdownOptions/Command
         cons/DropdownOptions/Command
         pair/DropdownOptions/Command
@@ -1859,9 +1884,9 @@ let exampleFromList2DropdownText2 =
                       ( dropdown/Text
                           "X"
                           ( fromList2/DropdownOptions/Text
-                              ([] : List Ast/DropdownOption/Text)
-                              (dropdownOption/Text "a" (literal/Text "1"))
-                              (dropdownOption/Text "b" (literal/Text "2"))
+                              ([] : List (DropdownOption Ast/Text))
+                              (dropdownOption Ast/Text "a" (literal/Text "1"))
+                              (dropdownOption Ast/Text "b" (literal/Text "2"))
                           )
                       )
                   )
@@ -1876,9 +1901,9 @@ let exampleFromList2DropdownText3 =
                       ( dropdown/Text
                           "X"
                           ( fromList2/DropdownOptions/Text
-                              [ dropdownOption/Text "a" (literal/Text "1") ]
-                              (dropdownOption/Text "b" (literal/Text "2"))
-                              (dropdownOption/Text "c" (literal/Text "3"))
+                              [ dropdownOption Ast/Text "a" (literal/Text "1") ]
+                              (dropdownOption Ast/Text "b" (literal/Text "2"))
+                              (dropdownOption Ast/Text "c" (literal/Text "3"))
                           )
                       )
                   )
@@ -1893,11 +1918,11 @@ let exampleFromList2DropdownText4 =
                       ( dropdown/Text
                           "X"
                           ( fromList2/DropdownOptions/Text
-                              [ dropdownOption/Text "a" (literal/Text "1")
-                              , dropdownOption/Text "b" (literal/Text "2")
+                              [ dropdownOption Ast/Text "a" (literal/Text "1")
+                              , dropdownOption Ast/Text "b" (literal/Text "2")
                               ]
-                              (dropdownOption/Text "c" (literal/Text "3"))
-                              (dropdownOption/Text "d" (literal/Text "4"))
+                              (dropdownOption Ast/Text "c" (literal/Text "3"))
+                              (dropdownOption Ast/Text "d" (literal/Text "4"))
                           )
                       )
                   )
@@ -2059,8 +2084,9 @@ let exampleAstNestedStringQueries =
                       ( dropdown/Text
                           "A"
                           ( pair/DropdownOptions/Text
-                              (dropdownOption/Text "1" (literal/Text "A1"))
-                              ( dropdownOption/Text
+                              (dropdownOption Ast/Text "1" (literal/Text "A1"))
+                              ( dropdownOption
+                                  Ast/Text
                                   "2"
                                   ( plusPlus/Text
                                       ( literal/Text
@@ -2069,11 +2095,13 @@ let exampleAstNestedStringQueries =
                                       ( dropdown/Text
                                           "B"
                                           ( pair/DropdownOptions/Text
-                                              ( dropdownOption/Text
+                                              ( dropdownOption
+                                                  Ast/Text
                                                   "1"
                                                   (literal/Text "A2B1")
                                               )
-                                              ( dropdownOption/Text
+                                              ( dropdownOption
+                                                  Ast/Text
                                                   "2"
                                                   (literal/Text "A2B2")
                                               )
@@ -2095,8 +2123,9 @@ let exampleAstQueryDepthIsPreservedByTheConversionFromNaturalToText =
                       ( dropdown/Text
                           "A"
                           ( pair/DropdownOptions/Text
-                              (dropdownOption/Text "1" (literal/Text "A1"))
-                              ( dropdownOption/Text
+                              (dropdownOption Ast/Text "1" (literal/Text "A1"))
+                              ( dropdownOption
+                                  Ast/Text
                                   "2"
                                   ( plusPlus/Text
                                       ( literal/Text
@@ -2106,11 +2135,13 @@ let exampleAstQueryDepthIsPreservedByTheConversionFromNaturalToText =
                                           ( dropdown/Natural
                                               "B"
                                               ( pair/DropdownOptions/Natural
-                                                  ( dropdownOption/Natural
+                                                  ( dropdownOption
+                                                      Ast/Natural
                                                       "1"
                                                       (literal/Natural 1221)
                                                   )
-                                                  ( dropdownOption/Natural
+                                                  ( dropdownOption
+                                                      Ast/Natural
                                                       "2"
                                                       (literal/Natural 1222)
                                                   )
@@ -2134,16 +2165,19 @@ let exampleAstDropdownOptionList =
                           ( dropdown/Natural
                               "Dropdown"
                               ( cons/DropdownOptions/Natural
-                                  ( dropdownOption/Natural
+                                  ( dropdownOption
+                                      Ast/Natural
                                       "A"
                                       (literal/Natural 1)
                                   )
                                   ( pair/DropdownOptions/Natural
-                                      ( dropdownOption/Natural
+                                      ( dropdownOption
+                                          Ast/Natural
                                           "B"
                                           (literal/Natural 2)
                                       )
-                                      ( dropdownOption/Natural
+                                      ( dropdownOption
+                                          Ast/Natural
                                           "C"
                                           (literal/Natural 3)
                                       )
@@ -2156,6 +2190,8 @@ let exampleAstDropdownOptionList =
         ===  "[[?{Dropdown|A,1|B,2|C,3}]]"
 
 in  { Character
+    , DropdownOption
+    , dropdownOption
     , Natural = Ast/Natural
     , Integer = Ast/Integer
     , Random/Natural = Ast/Random/Natural
@@ -2165,14 +2201,6 @@ in  { Character
     , Table = Ast/Table
     , Command = Ast/Command
     , Commands = Ast/Commands
-    , DropdownOption/Natural = Ast/DropdownOption/Natural
-    , DropdownOption/Integer = Ast/DropdownOption/Integer
-    , DropdownOption/Random/Natural = Ast/DropdownOption/Random/Natural
-    , DropdownOption/Random/Integer = Ast/DropdownOption/Random/Integer
-    , DropdownOption/Text = Ast/DropdownOption/Text
-    , DropdownOption/TableEntries = Ast/DropdownOption/TableEntries
-    , DropdownOption/Table = Ast/DropdownOption/Table
-    , DropdownOption/Command = Ast/DropdownOption/Command
     , DropdownOptions/Natural = Ast/DropdownOptions/Natural
     , DropdownOptions/Integer = Ast/DropdownOptions/Integer
     , DropdownOptions/Random/Natural = Ast/DropdownOptions/Random/Natural
@@ -2219,14 +2247,6 @@ in  { Character
     , input/Command
     , input/Random/Natural
     , input/Random/Integer
-    , dropdownOption/Natural
-    , dropdownOption/Integer
-    , dropdownOption/Random/Natural
-    , dropdownOption/Random/Integer
-    , dropdownOption/Text
-    , dropdownOption/TableEntries
-    , dropdownOption/Table
-    , dropdownOption/Command
     , dropdown/Natural
     , dropdown/Integer
     , dropdown/Random/Natural
