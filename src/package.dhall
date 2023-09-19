@@ -2247,6 +2247,7 @@ let exampleAstDropdownOptionList =
 in  { Character
     , DropdownOption
     , dropdownOption
+    , DropdownOption/map
     , Natural = Ast/Natural
     , Integer = Ast/Integer
     , Random/Natural = Ast/Random/Natural
